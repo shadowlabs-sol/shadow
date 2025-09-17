@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output
+
+# Production builds (except web)
+packages/programs/target/
+packages/confidential/target/
+packages/*/dist/
+packages/*/build/
+
+# Misc
+.DS_Store
+*.pem
+*.log
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Local env files
+.env*.local
+.env.development
+.env.test
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Rust
+**/*.rs.bk
+Cargo.lock
+
+# Solana
+.anchor/
+.cache/
+test-ledger/
+**/*.so
+
+# Documentation
+docs/
+
+# Git
+.git/
+.gitignore
+
+# Config files that aren't needed for deployment
+.eslintrc*
+.prettierrc*
+jest.config.*
+tsconfig.tsbuildinfo
+
+# Keep only web app
+!apps/web/
+!apps/web/**

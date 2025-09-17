@@ -1,0 +1,15 @@
+{
+    "name": "@shadow-protocol/confidential",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+      "build": "echo 'Arcium CLI required for build'",
+      "test": "echo 'Arcium CLI required for test'",
+      "clean": "rm -rf target",
+      "deploy": "echo 'Arcium CLI required for deploy'"
+    },
+    "devDependencies": {
+      "@types/node": "^20.0.0",
+      "typescript": "^5.0.0"
+    }
+  }

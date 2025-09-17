@@ -1,0 +1,17 @@
+[localnet]
+# Number of nodes in the single cluster of the localnet
+nodes = 2
+# Number of seconds to wait for the localnet to come online
+localnet_timeout_secs = 60
+
+[devnet]
+# Cluster offset for devnet deployment
+cluster_offset = 1116522165
+# RPC URL for devnet
+rpc_url = "https://api.devnet.solana.com"
+
+[testnet]
+# Cluster offset for testnet deployment
+cluster_offset = 3458519414
+# RPC URL for testnet
+rpc_url = "https://api.testnet.solana.com"

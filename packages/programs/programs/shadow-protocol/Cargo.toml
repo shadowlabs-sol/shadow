@@ -1,0 +1,32 @@
+[package]
+name = "shadow-protocol"
+version = "0.1.0"
+description = "Shadow Protocol - Privacy-Preserving Auction Platform"
+edition = "2021"
+rust-version = "1.75.0"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "shadow_protocol"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+
+[dependencies]
+anchor-lang = { version = "0.31.1", features = ["init-if-needed"] }
+anchor-spl = { version = "0.31.1" }
+# Arcium integration - with getrandom fix
+arcium-anchor = { version = "0.2.0" }
+arcium-client = { version = "0.2.0" }
+arcium-macros = { version = "0.2.0" }
+getrandom = { version = "0.2", features = ["custom"] }
+
+
+[dev-dependencies]
+solana-sdk = "2.3.1"
+solana-program-test = "2.3.1"

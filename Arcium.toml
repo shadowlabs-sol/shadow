@@ -1,0 +1,29 @@
+[project]
+name = "shadow-protocol"
+version = "0.1.0"
+
+[network]
+cluster_offset = 1116522165
+rpc_url = "https://api.mainnet-beta.solana.com"
+localnet_rpc_url = "http://127.0.0.1:8899"
+
+[programs.shadow-protocol]
+address = "Apw2K9F8KRSgie4iS5ea82Vd3XwTtmojQfXPdbxYFCQm"
+program = "packages/programs/shadow-protocol/target/deploy/shadow_protocol.so"
+idl = "apps/web/src/idl/shadow_protocol.json"
+
+[encrypted_instructions]
+sealed_bid_auction = "packages/programs/shadow-protocol/encrypted-ixs/sealed_bid_auction.rs"
+dutch_auction = "packages/programs/shadow-protocol/encrypted-ixs/dutch_auction.rs"
+batch_settlement = "packages/programs/shadow-protocol/encrypted-ixs/batch_settlement.rs"
+
+[provider]
+cluster = "mainnet-beta"
+wallet = "~/.config/solana/id.json"
+
+[arcium]
+endpoint = "https://testnet-api.arcium.com"
+
+[test]
+startup_wait = 10000
+shutdown_wait = 2000

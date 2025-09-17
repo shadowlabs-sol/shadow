@@ -1,0 +1,203 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Auction {
+  id                   String   @id @default(uuid())
+  auctionId           BigInt   @unique
+  title               String?
+  description         String?
+  creator             String
+  assetMint           String
+  assetVault          String?
+  type                AuctionType
+  status              AuctionStatus @default(CREATED)
+  startTime           DateTime
+  endTime             DateTime
+  minimumBid          BigInt
+  reservePriceEncrypted Bytes?
+  reservePriceNonce   String?
+  currentPrice        BigInt?
+  priceDecreaseRate   BigInt?
+  startingPrice       BigInt?
+  bidCount            Int      @default(0)
+  winner              String?
+  winningAmount       BigInt?
+  settledAt           DateTime?
+  transactionHash     String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  bids                Bid[]
+  settlements         Settlement[]
+  
+  @@index([status])
+  @@index([creator])
+  @@index([endTime])
+}
+
+model Bid {
+  id                  String   @id @default(uuid())
+  auctionId          BigInt
+  auction            Auction  @relation(fields: [auctionDbId], references: [id])
+  auctionDbId        String
+  bidder             String
+  amountEncrypted    Bytes
+  encryptionPublicKey Bytes?
+  nonce              String
+  timestamp          DateTime
+  isWinner           Boolean  @default(false)
+  transactionHash    String?
+  createdAt          DateTime @default(now())
+  
+  @@index([auctionId])
+  @@index([bidder])
+  @@index([timestamp])
+}
+
+model Settlement {
+  id                  String   @id @default(uuid())
+  auctionId          BigInt
+  auction            Auction  @relation(fields: [auctionDbId], references: [id])
+  auctionDbId        String
+  winner             String
+  winningAmount      BigInt
+  settlementTime     DateTime
+  transactionHash    String
+  mpcComputationId   String?
+  callbackData       Bytes?
+  createdAt          DateTime @default(now())
+  
+  @@index([auctionId])
+}
+
+model MXEComputation {
+  id                  String   @id @default(uuid())
+  computationOffset   BigInt   @unique
+  programId          String
+  status             ComputationStatus @default(QUEUED)
+  inputData          Bytes
+  outputData         Bytes?
+  errorMessage       String?
+  queuedAt           DateTime @default(now())
+  startedAt          DateTime?
+  completedAt        DateTime?
+  
+  @@index([status])
+  @@index([programId])
+}
+
+model User {
+  id                  String   @id @default(uuid())
+  walletAddress      String   @unique
+  username           String?  @unique
+  email              String?
+  bio                String?
+  avatar             String?
+  verified           Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  lastLogin          DateTime?
+  totalBids          Int      @default(0)
+  auctionsWon        Int      @default(0)
+  auctionsCreated    Int      @default(0)
+  totalVolume        BigInt   @default(0)
+  nonce              String?  // For signature verification
+  
+  sessions           Session[]
+  notifications      Notification[]
+  preferences        UserPreferences?
+  wallets            ConnectedWallet[]
+  
+  @@index([walletAddress])
+  @@index([username])
+}
+
+model Session {
+  id                  String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  walletAddress      String
+  token              String   @unique
+  expiresAt          DateTime
+  createdAt          DateTime @default(now())
+  
+  @@index([token])
+  @@index([userId])
+}
+
+model ConnectedWallet {
+  id                  String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  walletAddress      String
+  walletType         String   // phantom, solflare, etc
+  isPrimary          Boolean  @default(false)
+  connectedAt        DateTime @default(now())
+  
+  @@unique([userId, walletAddress])
+  @@index([userId])
+}
+
+model UserPreferences {
+  id                  String   @id @default(uuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailNotifications Boolean  @default(true)
+  bidNotifications   Boolean  @default(true)
+  winNotifications   Boolean  @default(true)
+  theme              String   @default("dark")
+  language           String   @default("en")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Notification {
+  id                  String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type               NotificationType
+  title              String
+  message            String
+  data               Json?
+  read               Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  
+  @@index([userId, read])
+}
+
+enum AuctionType {
+  SEALED
+  DUTCH
+  BATCH
+}
+
+enum AuctionStatus {
+  CREATED
+  ACTIVE
+  ENDED
+  SETTLED
+  CANCELLED
+}
+
+enum ComputationStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum NotificationType {
+  BID_PLACED
+  BID_OUTBID
+  AUCTION_WON
+  AUCTION_LOST
+  AUCTION_ENDED
+  AUCTION_CREATED
+  SYSTEM
+}
