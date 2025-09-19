@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Users, DollarSign, Shield, TrendingDown, Award, ArrowRight, Loader2, MoreHorizontal, Sparkles } from 'lucide-react';
+import { Clock, Users, DollarSign, Shield, TrendingDown, Award, ArrowRight, Loader2, MoreHorizontal, Sparkles, Eye, ExternalLink } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { AuctionTimer } from './AuctionTimer';
+import { NFTAssetViewer } from './NFTAssetViewer';
 import toast from 'react-hot-toast';
 
 interface AuctionCardProps {
@@ -19,6 +20,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auction, onBid, onSett
   const [bidAmount, setBidAmount] = useState('');
   const [showBidInput, setShowBidInput] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showNFTViewer, setShowNFTViewer] = useState(false);
 
   const handleBid = async () => {
     const amount = parseFloat(bidAmount);
@@ -143,18 +145,50 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auction, onBid, onSett
                 </div>
               </div>
 
-              {/* Manage Button */}
-              {onManage && (
-                <button
+              {/* Action Buttons */}
+              <div className="flex gap-2">
+                {/* View on Solscan Button */}
+                <a
+                  href={`https://solscan.io/account/${auction.auctionId}?cluster=devnet`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onManage();
+                    toast.success('Opening Solscan');
                   }}
-                  className="p-2 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-sm rounded-lg border border-white/[0.08] hover:border-white/[0.12] transition-all"
+                  className="p-2 bg-blue-600/20 hover:bg-blue-600/30 backdrop-blur-sm rounded-lg border border-blue-500/20 hover:border-blue-500/40 transition-all"
+                  title="View on Solscan"
                 >
-                  <MoreHorizontal className="w-4 h-4 text-gray-400 hover:text-white" />
-                </button>
-              )}
+                  <ExternalLink className="w-4 h-4 text-blue-400" />
+                </a>
+
+                {/* NFT Asset Viewer Button */}
+                {(auction.assetType === 'NFT' || auction.mintAddress) && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowNFTViewer(true);
+                    }}
+                    className="p-2 bg-purple-600/20 hover:bg-purple-600/30 backdrop-blur-sm rounded-lg border border-purple-500/20 hover:border-purple-500/40 transition-all"
+                    title="View NFT Asset"
+                  >
+                    <Eye className="w-4 h-4 text-purple-400" />
+                  </button>
+                )}
+
+                {/* Manage Button */}
+                {onManage && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onManage();
+                    }}
+                    className="p-2 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-sm rounded-lg border border-white/[0.08] hover:border-white/[0.12] transition-all"
+                  >
+                    <MoreHorizontal className="w-4 h-4 text-gray-400 hover:text-white" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
