@@ -19,7 +19,7 @@ A privacy-preserving auction platform built on Solana using Arcium's MPC. Shadow
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-org/shadow-protocol.git
+   git clone https://github.com/shadow-protocol/shadow.git
    cd shadow-protocol
    ```
 
