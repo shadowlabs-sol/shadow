@@ -5,7 +5,6 @@ import { motion, useScroll, useTransform, useSpring, useInView, AnimatePresence 
 import { ArrowRight, Lock, Shield, Zap, Eye, Users, Award, ChevronDown, Sparkles, Activity, TrendingUp, Globe, Clock, CheckCircle, Star, Github, Twitter } from 'lucide-react';
 
 
-// Particle background component
 function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -87,12 +86,11 @@ export default function Home() {
   const [activeFeature, setActiveFeature] = useState<number | null>(null);
   const { scrollYProgress } = useScroll();
   
-  // Smooth spring animations for parallax
-  const heroY = useSpring(useTransform(scrollYProgress, [0, 0.5], [0, -100]), {
+  const heroY = useSpring(0, {
     stiffness: 100,
     damping: 30
   });
-  const heroOpacity = useSpring(useTransform(scrollYProgress, [0, 0.3], [1, 0]), {
+  const heroOpacity = useSpring(1, {
     stiffness: 100,
     damping: 30
   });
@@ -101,8 +99,6 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  if (!mounted) return null;
 
   const features = [
     {
@@ -188,8 +184,7 @@ export default function Home() {
         />
       </div>
 
-      {/* Navigation */}
-      <nav className="relative z-50 px-8 py-6 md:px-16 md:py-8">
+      <nav className="relative z-50 px-8 py-4 md:px-16 md:py-6 absolute top-0 left-0 right-0">
         <div className="flex items-center justify-between">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -233,22 +228,13 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative z-10 px-8 py-20 md:px-16 md:py-32">
-        <motion.div
-          style={{ y: heroY, opacity: heroOpacity }}
-          className="max-w-6xl mx-auto"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-center"
-          >
+      <section className="relative z-10 px-8 pt-20 pb-20 md:px-16 md:pt-24 md:pb-32 hero-container">
+        <div className="max-w-6xl mx-auto w-full">
+          <div className="text-center hero-content">
             <motion.div 
-              initial={{ scale: 0 }}
+              initial={{ scale: 1 }}
               animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
+              transition={{ type: "spring", stiffness: 200 }}
               className="inline-flex items-center space-x-2 px-4 py-2 mb-8 bg-gradient-to-r from-purple-100 to-pink-100 backdrop-blur-sm rounded-full border border-purple-200/50"
             >
               <Activity className="w-4 h-4 text-purple-600" />
@@ -259,9 +245,9 @@ export default function Home() {
             
             <motion.h1 
               className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight tracking-tight mb-6"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
+              transition={{ duration: 0.3 }}
             >
               <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
                 Auctions that
@@ -281,18 +267,18 @@ export default function Home() {
             
             <motion.p 
               className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed"
-              initial={{ opacity: 0 }}
+              initial={{ opacity: 1 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
+              transition={{ duration: 0.3 }}
             >
               Private auctions with encrypted bids and secure settlement on Solana.
             </motion.p>
             
             <motion.div 
               className="flex flex-col sm:flex-row gap-4 justify-center"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
+              transition={{ duration: 0.3 }}
             >
               <motion.a 
                 href="/app" 
@@ -319,23 +305,23 @@ export default function Home() {
                 </span>
               </motion.a>
               
-              <motion.button 
+              <motion.button
                 className="group px-8 py-4 bg-white/80 backdrop-blur-sm border-2 border-gray-200 rounded-full hover:border-purple-300 transition-all hover:shadow-lg hover:shadow-purple-200/50"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <span className="flex items-center justify-center space-x-2">
-                  <Github className="w-5 h-5" />
-                  <span className="font-semibold text-gray-800">View on GitHub</span>
-                </span>
+                  <span className="flex items-center justify-center space-x-2">
+                    <Github className="w-5 h-5 text-gray-800" />
+                    <span className="font-semibold text-gray-800">View on GitHub</span>
+                  </span>
               </motion.button>
             </motion.div>
 
             {/* Live stats ticker */}
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={{ opacity: 1 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
+              transition={{ duration: 0.3 }}
               className="mt-16 flex items-center justify-center space-x-8 text-sm"
             >
               <div className="flex items-center space-x-2">
@@ -343,28 +329,23 @@ export default function Home() {
                 <span className="text-gray-600">Network: Active</span>
               </div>
               <div className="flex items-center space-x-2">
-                <TrendingUp className="w-4 h-4 text-green-500" />
-                <span className="text-gray-600">Gas: ~0.0002 SOL</span>
-              </div>
-              <div className="flex items-center space-x-2">
                 <Clock className="w-4 h-4 text-blue-500" />
                 <span className="text-gray-600">Solana Devnet</span>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
 
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={{ opacity: 1 }}
             animate={{ opacity: 1, ...floatingAnimation }}
-            transition={{ duration: 1, delay: 1 }}
+            transition={{ duration: 0.3 }}
             className="flex justify-center mt-20"
           >
             <ChevronDown className="w-6 h-6 text-gray-400" />
           </motion.div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* Features Grid with Hover Effects */}
       <section id="features" className="relative z-10 px-8 py-20 md:px-16">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -589,7 +570,7 @@ export default function Home() {
             >
               <span className="flex items-center justify-center space-x-2">
                 <Twitter className="w-5 h-5 text-blue-500" />
-                <span>Follow Updates</span>
+                <span className='text-blue-900'>Follow Updates</span>
               </span>
             </motion.a>
           </motion.div>

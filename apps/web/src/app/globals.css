@@ -181,6 +181,7 @@ body {
   overflow-x: hidden;
   transition: background 0.5s ease, color 0.3s ease;
   min-height: 100vh;
+  min-height: 100dvh; /* Use dynamic viewport height for better mobile support */
 }
 
 /* Ensure dark mode by default */
@@ -374,6 +375,37 @@ body::before {
 
 .transition-smooth {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Viewport height utilities */
+.min-h-screen {
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+}
+
+.h-screen {
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile */
+}
+
+/* Fix for scroll-to-top behavior */
+section:first-of-type {
+  scroll-margin-top: 0;
+}
+
+/* Ensure content is always visible */
+.hero-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Full viewport height */
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+}
+
+/* Force immediate visibility */
+.hero-content {
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 /* Responsive container */
