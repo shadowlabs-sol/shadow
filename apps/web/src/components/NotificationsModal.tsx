@@ -9,10 +9,8 @@ import {
   DollarSign, 
   AlertTriangle, 
   Clock, 
-  CheckCircle, 
   Trash2,
   Settings,
-  MarkAsUnread,
   Search,
   Filter
 } from 'lucide-react';

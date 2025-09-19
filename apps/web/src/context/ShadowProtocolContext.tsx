@@ -269,7 +269,7 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
           
         } catch (onchainError) {
           console.warn('Real transaction failed, using development mode:', onchainError);
-          toast.warning('📝 Running in development mode - no real blockchain transaction');
+          toast('📝 Running in development mode - no real blockchain transaction', { icon: '⚠️' });
           // Fall back to using development mode without a real transaction
         }
       }
@@ -555,12 +555,12 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
         console.error('MPC computation error:', mpcError);
         // Fallback: determine winner from actual bids (highest amount wins)
         if (allBids.length > 0) {
-          const sortedBids = allBids.sort((a, b) => b.amount - a.amount);
+          const sortedBids = allBids.sort((a: any, b: any) => b.amount - a.amount);
           const winningBid = sortedBids[0];
           mpcResult = {
             winner: winningBid.bidder,
             winningAmount: winningBid.amount,
-            rankings: sortedBids.map((bid, index) => ({
+            rankings: sortedBids.map((bid: any, index: number) => ({
               rank: index + 1,
               bidder: bid.bidder,
               amount: bid.amount
