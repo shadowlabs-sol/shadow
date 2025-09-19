@@ -176,62 +176,14 @@ const finalResult = await client.waitForComputation(settlement.signature);
 console.log('Final result:', finalResult);
 ```
 
-## 🔧 Configuration
-
-### Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `SOLANA_RPC_URL` | Solana RPC endpoint | `https://api.devnet.solana.com` |
-| `SOLANA_CLUSTER` | Solana cluster | `devnet` |
-| `ARCIUM_CLUSTER_OFFSET` | Arcium cluster identifier | `2326510165` |
-| `SHADOW_PROTOCOL_PROGRAM_ID` | Deployed program ID | - |
-| `NEXT_PUBLIC_APP_URL` | Frontend URL | `http://localhost:3000` |
-
-### Arcium Configuration
-
-Edit `packages/confidential/Arcium.toml` to configure MPC settings:
-
-```toml
-[provider]
-cluster = "devnet"
-wallet = "~/.config/solana/id.json"
-
-[programs.devnet]
-shadow_protocol = "YourProgramID"
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
-
-### Development Setup
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes and add tests
-4. Run the test suite: `bun run test`
-5. Commit your changes: `git commit -m 'Add amazing feature'`
-6. Push to the branch: `git push origin feature/amazing-feature`
-7. Open a Pull Request
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
 ## 🔗 Links
 
-- **Website**: [shadowprotocol.xyz](https://shadowprotocol.xyz)
-- **Documentation**: [docs.shadowprotocol.xyz](https://docs.shadowprotocol.xyz)
-- **Discord**: [discord.gg/shadowprotocol](https://discord.gg/shadowprotocol)
-- **Twitter**: [@ShadowProtocol](https://twitter.com/ShadowProtocol)
-
-## 🙏 Acknowledgments
-
-- **Arcium Team** - For the incredible MPC technology
-- **Solana Foundation** - For the high-performance blockchain
-- **Anchor Framework** - For Solana development tools
-- **Open Source Community** - For the amazing tools and libraries
+- **Website**: [shadowprotocol.fun](https://shadowprotocol.fun)
+- **Documentation**: [shadowprotocol.fun/docs](https://shadowprotocol.fun/docs)
 
 ---
 
