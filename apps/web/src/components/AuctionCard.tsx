@@ -271,9 +271,18 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auction, onBid, onSett
                       <Sparkles className="w-4 h-4 text-purple-400" />
                       <div>
                         <p className="text-[10px] text-purple-400">Winner</p>
-                        <p className="text-xs font-mono text-white">
+                        <a
+                          href={`https://solscan.io/account/${auction.winner}?cluster=devnet`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-mono text-white hover:text-purple-300 transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toast.success('Opening winner on Solscan');
+                          }}
+                        >
                           {auction.winner.slice(0, 6)}...{auction.winner.slice(-4)}
-                        </p>
+                        </a>
                       </div>
                     </div>
                     {auction.winningAmount && (
@@ -380,6 +389,14 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auction, onBid, onSett
           </div>
         </div>
       </div>
+
+      {/* NFT Asset Viewer Modal */}
+      <NFTAssetViewer
+        mintAddress={auction.mintAddress}
+        metadata={auction.metadata}
+        isOpen={showNFTViewer}
+        onClose={() => setShowNFTViewer(false)}
+      />
     </motion.div>
   );
 };

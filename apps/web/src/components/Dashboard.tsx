@@ -9,7 +9,7 @@ import {
   Plus, Shield, Eye, Zap, RefreshCw, Search, Filter, 
   TrendingUp, Activity, Clock, Users, DollarSign, Award,
   ArrowUp, ArrowDown, BarChart3, PieChart, Sparkles,
-  Timer, AlertCircle, CheckCircle, XCircle
+  Timer, AlertCircle, CheckCircle, XCircle, ExternalLink
 } from 'lucide-react';
 import { useShadowProtocol } from '@/context/ShadowProtocolContext';
 import { AuctionCard } from './AuctionCard';
@@ -679,13 +679,33 @@ export const Dashboard: React.FC = () => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-white/80">Address</span>
-                  <span className="font-bold font-mono text-xs">
-                    {publicKey ? `${publicKey.toString().slice(0, 4)}...${publicKey.toString().slice(-4)}` : '-'}
-                  </span>
+                  {publicKey ? (
+                    <a
+                      href={`https://solscan.io/account/${publicKey.toString()}?cluster=devnet`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold font-mono text-xs text-white hover:text-purple-200 transition-colors flex items-center gap-1"
+                      onClick={() => toast.success('Opening wallet on Solscan')}
+                    >
+                      {publicKey.toString().slice(0, 4)}...{publicKey.toString().slice(-4)}
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  ) : (
+                    <span className="font-bold font-mono text-xs">-</span>
+                  )}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/80">Network</span>
-                  <span className="font-bold">Devnet</span>
+                  <a
+                    href="https://solscan.io/?cluster=devnet"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-bold text-white hover:text-purple-200 transition-colors flex items-center gap-1"
+                    onClick={() => toast.success('Opening Solana Devnet on Solscan')}
+                  >
+                    Devnet
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/80">Status</span>
