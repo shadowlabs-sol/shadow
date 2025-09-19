@@ -373,8 +373,7 @@ export const WalletAuthButton: React.FC = () => {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log('⚙️ Settings button clicked from WalletAuthButton!!!');
-                        alert('⚙️ Settings modal would open here!');
+                        setShowSettingsModal(true);
                         setDropdownOpen(false);
                       }}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm bg-gradient-to-r from-purple-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 rounded-xl transition-all border border-purple-500/20 hover:border-purple-500/40 group"
@@ -434,6 +433,18 @@ export const WalletAuthButton: React.FC = () => {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         mode={modalMode}
+      />
+      
+      {/* Notifications Modal */}
+      <NotificationsModal
+        isOpen={showNotificationsModal}
+        onClose={() => setShowNotificationsModal(false)}
+      />
+      
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
       />
     </>
   );
