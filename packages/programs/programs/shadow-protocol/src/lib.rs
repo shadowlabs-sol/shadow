@@ -1,6 +1,28 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{Token, TokenAccount, Mint};
 
+#[cfg(target_os = "solana")]
+use getrandom::register_custom_getrandom;
+
+#[cfg(target_os = "solana")]
+fn custom_random(buf: &mut [u8]) -> std::result::Result<(), getrandom::Error> {
+    use anchor_lang::solana_program::clock;
+    
+    let seed = match clock::Clock::get() {
+        Ok(clock) => clock.slot.wrapping_add(clock.unix_timestamp as u64),
+        Err(_) => 12345u64,
+    };
+    
+    let mut state = seed;
+    for (i, byte) in buf.iter_mut().enumerate() {
+        state = state.wrapping_mul(1103515245).wrapping_add(12345).wrapping_add(i as u64);
+        *byte = (state >> 8) as u8;
+    }
+    
+    Ok(())
+}
+
+#[cfg(target_os = "solana")]
+register_custom_getrandom!(custom_random);
 
 mod instructions;
 mod state;
@@ -8,8 +30,6 @@ mod error;
 mod crypto;
 
 use instructions::*;
-use state::*;
-use error::*;
 
 declare_id!("Apw2K9F8KRSgie4iS5ea82Vd3XwTtmojQfXPdbxYFCQm");
 
@@ -155,13 +175,6 @@ pub mod shadow_protocol {
     }
 
 
-    pub fn arcium_callback(
-        ctx: Context<ArciumCallback>,
-        computation_id: [u8; 32],
-        result: Vec<u8>,
-    ) -> Result<()> {
-        instructions::arcium_callback(ctx, computation_id, result)
-    }
 
     pub fn cleanup_expired_auction(
         ctx: Context<CleanupExpiredAuction>,
