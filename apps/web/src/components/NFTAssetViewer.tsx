@@ -70,24 +70,22 @@ export const NFTAssetViewer: React.FC<NFTAssetViewerProps> = ({
     setError(null);
 
     try {
-      // In a real implementation, you would use Metaplex or similar to fetch metadata
-      // For now, we'll simulate with a mock response
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      // TODO: Implement real NFT metadata fetching using Metaplex or similar
+      // This would fetch actual metadata from the blockchain
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Mock metadata for demonstration
-      const mockMetadata: NFTMetadata = {
-        name: `NFT #${mintAddress.slice(0, 8)}`,
-        description: "This is a sample NFT description. In a real implementation, this would be fetched from the blockchain.",
-        image: `https://via.placeholder.com/400x400/7c3aed/ffffff?text=NFT+${mintAddress.slice(0, 4)}`,
+      // For now, show basic information until proper NFT integration is implemented
+      const basicMetadata: NFTMetadata = {
+        name: `Token ${mintAddress.slice(0, 8)}...`,
+        description: "NFT metadata loading requires Metaplex integration. This shows basic token information.",
         external_url: `https://solscan.io/token/${mintAddress}`,
         attributes: [
-          { trait_type: "Rarity", value: "Rare" },
-          { trait_type: "Color", value: "Purple" },
-          { trait_type: "Type", value: "Digital Art" }
+          { trait_type: "Token Address", value: mintAddress },
+          { trait_type: "Status", value: "Metadata Pending" }
         ]
       };
 
-      setMetadata(mockMetadata);
+      setMetadata(basicMetadata);
     } catch (err) {
       setError("Failed to load NFT metadata");
       console.error("Error fetching NFT metadata:", err);

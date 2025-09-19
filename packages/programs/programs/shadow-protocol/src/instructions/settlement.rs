@@ -120,15 +120,32 @@ pub fn execute_settlement(
     
     require!(!protocol.paused, ShadowProtocolError::ProtocolPaused);
     
-    // Check that settlement is authorized
+    // Check that settlement is authorized by MPC
     require!(
         auction.settlement_authorized,
         ShadowProtocolError::SettlementNotAuthorized
     );
     
+    // Verify MPC verification hash exists
+    require!(
+        auction.mpc_verification_hash.is_some(),
+        ShadowProtocolError::MpcVerificationFailed
+    );
+    
     require!(
         auction.status == AuctionStatus::Ended,
         ShadowProtocolError::InvalidAuctionStatus
+    );
+    
+    // Verify settlement parameters match MPC results
+    require!(
+        auction.winner == Some(winner),
+        ShadowProtocolError::InvalidWinnerDetermination
+    );
+    
+    require!(
+        auction.winning_amount == winning_amount,
+        ShadowProtocolError::InvalidAssetAmount
     );
     
     require!(
@@ -142,14 +159,11 @@ pub fn execute_settlement(
         ShadowProtocolError::InvalidAssetAmount
     );
     
-    // Validate winner is provided
+    // Validate winner is provided (already set by MPC)
     require!(
         winner != Pubkey::default(),
         ShadowProtocolError::InvalidWinnerDetermination
     );
-    
-    auction.winner = Some(winner);
-    auction.winning_amount = winning_amount;
     auction.status = AuctionStatus::Settled;
     auction.settled_at = Some(Clock::get()?.unix_timestamp);
     

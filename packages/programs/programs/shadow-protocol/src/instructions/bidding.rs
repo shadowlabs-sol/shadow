@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{Token, TokenAccount, Mint, Transfer, transfer};
 use crate::state::*;
 use crate::error::ShadowProtocolError;
+use crate::crypto::CryptoUtils;
 
 /// Calculate current Dutch auction price based on time progression
 fn calculate_dutch_auction_price(auction: &AuctionAccount) -> Result<u64> {
@@ -70,6 +71,28 @@ pub fn submit_encrypted_bid(
     require!(
         auction.bid_count < MAX_BIDS_PER_AUCTION as u64,
         ShadowProtocolError::MaxBidsExceeded
+    );
+    
+    // Validate encryption parameters
+    CryptoUtils::validate_encrypted_bid(
+        &bid_amount_encrypted,
+        &public_key,
+        nonce,
+        auction.minimum_bid,
+    )?;
+    
+    // Verify encryption key is properly derived
+    let is_valid_key = CryptoUtils::verify_encryption_key(
+        public_key,
+        auction_id,
+        ctx.accounts.bidder.key(),
+        auction.creator,
+        nonce,
+    )?;
+    
+    require!(
+        is_valid_key,
+        ShadowProtocolError::InvalidEncryption
     );
     
     let bid = &mut ctx.accounts.bid;

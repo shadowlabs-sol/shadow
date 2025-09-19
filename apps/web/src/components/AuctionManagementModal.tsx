@@ -2,9 +2,15 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trash2, Ban, Edit3, Eye, Users, DollarSign, Clock, Shield, TrendingDown, Award, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { X, Trash2, Ban, Edit3, Eye, Users, DollarSign, Clock, Shield, TrendingDown, Award, AlertTriangle, CheckCircle, Info, ExternalLink } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import toast from 'react-hot-toast';
+import { 
+  getTransactionDisplayInfo, 
+  getSolscanAccountUrl, 
+  getSolscanTokenUrl,
+  isValidSolanaAddress 
+} from '@/utils/transaction';
 
 interface AuctionManagementModalProps {
   isOpen: boolean;
@@ -28,6 +34,7 @@ export const AuctionManagementModal: React.FC<AuctionManagementModalProps> = ({
   const [activeTab, setActiveTab] = useState<'details' | 'bids' | 'actions'>('details');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [showSettleConfirm, setShowSettleConfirm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
   if (!isOpen || !auction) return null;
@@ -66,12 +73,13 @@ export const AuctionManagementModal: React.FC<AuctionManagementModalProps> = ({
     setIsProcessing(true);
     try {
       await onSettle(auction.auctionId);
-      toast.success('Settlement initiated');
+      toast.success('Settlement initiated successfully');
       onClose();
     } catch (error) {
       toast.error('Failed to settle auction');
     } finally {
       setIsProcessing(false);
+      setShowSettleConfirm(false);
     }
   };
 
@@ -261,19 +269,85 @@ export const AuctionManagementModal: React.FC<AuctionManagementModalProps> = ({
                     {/* Technical Details */}
                     <div className="pt-4 border-t border-gray-700/30">
                       <h3 className="text-sm font-semibold text-gray-400 mb-3">Technical Details</h3>
+                      <p className="text-xs text-gray-500 mb-3 italic">External links open blockchain data on Solscan</p>
                       <div className="space-y-2 text-xs">
-                        <div className="flex justify-between">
+                        <div className="flex justify-between items-center">
                           <span className="text-gray-500">Auction ID:</span>
                           <span className="font-mono text-gray-400">{auction.auctionId}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Asset Mint:</span>
-                          <span className="font-mono text-gray-400">{auction.assetMint.slice(0, 12)}...</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Transaction:</span>
-                          <span className="font-mono text-gray-400">{auction.transactionHash?.slice(0, 12)}...</span>
-                        </div>
+                        {auction.assetMint && isValidSolanaAddress(auction.assetMint) && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-500">Asset Mint:</span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-gray-400">{auction.assetMint.slice(0, 12)}...</span>
+                              <a
+                                href={getSolscanTokenUrl(auction.assetMint)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1 hover:bg-gray-600/20 rounded transition-colors"
+                                title="View Asset on Solscan"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toast.success('Opening asset on Solscan');
+                                }}
+                              >
+                                <ExternalLink className="w-3 h-3 text-blue-400" />
+                              </a>
+                            </div>
+                          </div>
+                        )}
+                        {auction.auctionAccount && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-500">Auction Account:</span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-gray-400">{auction.auctionAccount.slice(0, 12)}...</span>
+                              <a
+                                href={`https://solscan.io/account/${auction.auctionAccount}?cluster=devnet`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1 hover:bg-gray-600/20 rounded transition-colors"
+                                title="View Auction Account on Solscan"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toast.success('Opening auction account on Solscan');
+                                }}
+                              >
+                                <ExternalLink className="w-3 h-3 text-blue-400" />
+                              </a>
+                            </div>
+                          </div>
+                        )}
+                        {auction.transactionHash && (() => {
+                          const txInfo = getTransactionDisplayInfo(auction.transactionHash);
+                          return (
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-500">Transaction:</span>
+                              <div className="flex items-center gap-2">
+                                <span className={`font-mono ${txInfo.className}`}>
+                                  {txInfo.displayText}
+                                </span>
+                                {txInfo.badge && (
+                                  <span className="text-xs text-gray-500 italic">{txInfo.badge}</span>
+                                )}
+                                {txInfo.showLink && txInfo.url && (
+                                  <a
+                                    href={txInfo.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-1 hover:bg-gray-600/20 rounded transition-colors"
+                                    title="View Transaction on Solscan"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toast.success('Opening transaction on Solscan');
+                                    }}
+                                  >
+                                    <ExternalLink className="w-3 h-3 text-blue-400" />
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -337,25 +411,65 @@ export const AuctionManagementModal: React.FC<AuctionManagementModalProps> = ({
                     ) : (
                       <>
                         {/* Settle Auction */}
-                        {auction.status === 'ENDED' && onSettle && (
-                          <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-                            <div className="flex items-start gap-3">
-                              <Award className="w-5 h-5 text-blue-400 mt-0.5" />
-                              <div className="flex-1">
-                                <h4 className="font-semibold text-white mb-1">Settle Auction</h4>
-                                <p className="text-sm text-gray-400 mb-3">
-                                  Finalize the auction and determine the winner through the MPC network.
-                                </p>
-                                <button
-                                  onClick={handleSettle}
-                                  disabled={isProcessing}
-                                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  {isProcessing ? 'Processing...' : 'Settle Now'}
-                                </button>
+                        {(auction.status === 'ACTIVE' || auction.status === 'ENDED') && onSettle && (
+                          <>
+                            {!showSettleConfirm ? (
+                              <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+                                <div className="flex items-start gap-3">
+                                  <Award className="w-5 h-5 text-blue-400 mt-0.5" />
+                                  <div className="flex-1">
+                                    <h4 className="font-semibold text-white mb-1">
+                                      {auction.status === 'ACTIVE' ? 'Force Settle Auction' : 'Settle Auction'}
+                                    </h4>
+                                    <p className="text-sm text-gray-400 mb-3">
+                                      {auction.status === 'ACTIVE' 
+                                        ? 'Manually end and settle the auction before the scheduled end time. This will determine the winner through the MPC network.'
+                                        : 'Finalize the auction and determine the winner through the MPC network.'
+                                      }
+                                    </p>
+                                    <button
+                                      onClick={() => setShowSettleConfirm(true)}
+                                      disabled={isProcessing}
+                                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                      {auction.status === 'ACTIVE' ? 'Force Settle' : 'Settle Now'}
+                                    </button>
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-                          </div>
+                            ) : (
+                              <div className="p-4 bg-blue-500/20 border-2 border-blue-500/50 rounded-xl">
+                                <div className="flex items-start gap-3">
+                                  <Award className="w-5 h-5 text-blue-400 mt-0.5" />
+                                  <div className="flex-1">
+                                    <h4 className="font-semibold text-white mb-1">Confirm Settlement</h4>
+                                    <p className="text-sm text-gray-400 mb-3">
+                                      {auction.status === 'ACTIVE' 
+                                        ? 'Are you sure you want to force settle this auction? This will end the auction immediately and determine the winner based on current bids.'
+                                        : 'Are you sure you want to settle this auction? This will determine the winner and complete the auction.'
+                                      }
+                                    </p>
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={handleSettle}
+                                        disabled={isProcessing}
+                                        className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                      >
+                                        {isProcessing ? 'Settling...' : 'Yes, Settle'}
+                                      </button>
+                                      <button
+                                        onClick={() => setShowSettleConfirm(false)}
+                                        disabled={isProcessing}
+                                        className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </>
                         )}
 
                         {/* Cancel Auction */}

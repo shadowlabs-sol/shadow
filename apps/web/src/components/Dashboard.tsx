@@ -15,7 +15,6 @@ import { useShadowProtocol } from '@/context/ShadowProtocolContext';
 import { AuctionCard } from './AuctionCard';
 import { WalletBalance } from './WalletBalance';
 
-// Lazy load heavy components for better performance
 const CreateAuctionModal = dynamic(() => import('./CreateAuctionModal').then(mod => ({ default: mod.CreateAuctionModal })), {
   ssr: false,
   loading: () => <div className="animate-pulse">Loading...</div>
@@ -35,7 +34,6 @@ const SettlementNotification = dynamic(() => import('./SettlementNotification').
 });
 import toast, { Toaster } from 'react-hot-toast';
 
-// Optimized countdown timer with memoization
 const CountdownTimer = memo(({ endTime }: { endTime: number }) => {
   const [timeLeft, setTimeLeft] = useState('');
   const intervalRef = useRef<NodeJS.Timeout>();
@@ -88,7 +86,6 @@ const CountdownTimer = memo(({ endTime }: { endTime: number }) => {
 
 CountdownTimer.displayName = 'CountdownTimer';
 
-// Memoized stat card for better performance
 const StatCard = memo(({ 
   icon: Icon, 
   title, 
@@ -107,7 +104,6 @@ const StatCard = memo(({
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
-    // Disable animation for performance
     setDisplayValue(value);
   }, [value]);
 
@@ -139,7 +135,6 @@ const StatCard = memo(({
 
 StatCard.displayName = 'StatCard';
 
-// Memoized activity feed
 const ActivityFeed = memo(({ activities }: { activities: any[] }) => {
   return (
     <motion.div
@@ -211,10 +206,8 @@ export const Dashboard: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [settlementDetails, setSettlementDetails] = useState<any>(null);
 
-  // Real activities will be fetched from blockchain events
   const [activities] = useState<any[]>([]);
 
-  // Check for settlement notifications from window
   useEffect(() => {
     const checkSettlement = setInterval(() => {
       if ((window as any).__lastSettlement) {
@@ -226,7 +219,6 @@ export const Dashboard: React.FC = () => {
     return () => clearInterval(checkSettlement);
   }, []);
 
-  // Calculate statistics
   const stats = {
     totalAuctions: auctions.length,
     activeAuctions: auctions.filter((a: any) => a.status === 'ACTIVE').length,
@@ -254,7 +246,6 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  // Filter and sort auctions
   let filteredAuctions = auctions.filter((auction: any) => {
     if (filter === 'active' && auction.status !== 'ACTIVE') return false;
     if (filter === 'ended' && auction.status === 'ACTIVE') return false;
@@ -271,7 +262,6 @@ export const Dashboard: React.FC = () => {
     return true;
   });
 
-  // Sort auctions
   filteredAuctions = [...filteredAuctions].sort((a: any, b: any) => {
     switch (sortBy) {
       case 'ending':
@@ -397,14 +387,12 @@ export const Dashboard: React.FC = () => {
     <div className="min-h-screen">
       <Toaster position="top-right" />
       
-      {/* Background effects */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-20 left-20 w-[500px] h-[500px] bg-gradient-to-br from-purple-500/10 to-pink-500/5 rounded-full blur-[120px] animate-float" />
         <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-gradient-to-br from-blue-500/10 to-cyan-500/5 rounded-full blur-[120px] animate-float" style={{ animationDelay: '2s' }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-violet-500/5 to-indigo-500/5 rounded-full blur-[150px]" />
       </div>
 
-      {/* Navigation */}
       <nav className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--glass)] backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
@@ -451,7 +439,6 @@ export const Dashboard: React.FC = () => {
         </div>
       </nav>
 
-      {/* Statistics Dashboard */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -489,7 +476,6 @@ export const Dashboard: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* Auction Flow Indicator for active auction */}
         {filteredAuctions.length > 0 && filteredAuctions[0].status === 'ACTIVE' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -504,7 +490,6 @@ export const Dashboard: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Search and Filter Bar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -554,7 +539,6 @@ export const Dashboard: React.FC = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Auctions Grid */}
           <div className="lg:col-span-2">
             <motion.h2 
               className="text-xl font-bold text-[var(--foreground)] mb-6 flex items-center gap-2"
@@ -652,7 +636,6 @@ export const Dashboard: React.FC = () => {
             )}
           </div>
 
-          {/* Activity Feed */}
           <div className="lg:col-span-1">
             <motion.h2 
               className="text-xl font-bold text-[var(--foreground)] mb-6 flex items-center gap-2"
@@ -665,7 +648,6 @@ export const Dashboard: React.FC = () => {
             
             <ActivityFeed activities={activities} />
 
-            {/* Quick Stats */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -717,7 +699,6 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Modals */}
       <AnimatePresence>
         {showCreateModal && (
           <CreateAuctionModal
@@ -789,7 +770,6 @@ export const Dashboard: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Settlement Notification */}
       {settlementDetails && (
         <SettlementNotification
           details={settlementDetails}

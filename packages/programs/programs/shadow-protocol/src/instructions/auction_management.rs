@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{Token, TokenAccount, Mint, Transfer, transfer};
 use crate::state::*;
 use crate::error::ShadowProtocolError;
+use crate::crypto::CryptoUtils;
 
 pub fn create_sealed_auction(
     ctx: Context<CreateSealedAuction>,

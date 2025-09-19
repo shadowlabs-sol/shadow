@@ -103,4 +103,16 @@ pub enum ShadowProtocolError {
     
     #[msg("Price below minimum floor")]
     PriceBelowMinimumFloor,
+    
+    #[msg("Invalid computation ID")]
+    InvalidComputationId,
+    
+    #[msg("Invalid MPC result format")]
+    InvalidMpcResult,
+    
+    #[msg("MPC verification hash mismatch")]
+    InvalidMpcVerification,
+    
+    #[msg("Bid amount too low")]
+    BidTooLow,
 }

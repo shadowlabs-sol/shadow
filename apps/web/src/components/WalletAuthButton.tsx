@@ -12,6 +12,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/context/AuthContext';
 import { AuthModal } from './AuthModal';
+import { NotificationsModal } from './NotificationsModal';
+import { SettingsModal } from './SettingsModal';
 
 export const WalletAuthButton: React.FC = () => {
   const { publicKey, disconnect, wallet, connected, connecting, connect } = useWallet();
@@ -19,6 +21,8 @@ export const WalletAuthButton: React.FC = () => {
   const { user, isAuthenticated, login, logout, refreshUser } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [modalMode, setModalMode] = useState<'login' | 'profile'>('login');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -324,22 +328,6 @@ export const WalletAuthButton: React.FC = () => {
               </div>
 
               <div className="p-2">
-                {/* TEST BUTTON - Always visible at the top */}
-                <motion.button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('🧪 TEST BUTTON CLICKED FROM WALLETAUTHBUTTON!!!');
-                    alert('🧪 TEST BUTTON WORKS! Found the right component!');
-                  }}
-                  className="w-full flex items-center justify-center gap-3 px-4 py-4 mb-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-red-500/20 border-2 border-red-400"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  type="button"
-                >
-                  <span className="text-lg">🧪 TEST BUTTON</span>
-                </motion.button>
-
                 {!isAuthenticated ? (
                   <motion.button
                     onClick={handleLogin}

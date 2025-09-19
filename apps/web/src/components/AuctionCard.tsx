@@ -147,21 +147,6 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auction, onBid, onSett
 
               {/* Action Buttons */}
               <div className="flex gap-2">
-                {/* View on Solscan Button */}
-                <a
-                  href={`https://solscan.io/account/${auction.auctionId}?cluster=devnet`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toast.success('Opening Solscan');
-                  }}
-                  className="p-2 bg-blue-600/20 hover:bg-blue-600/30 backdrop-blur-sm rounded-lg border border-blue-500/20 hover:border-blue-500/40 transition-all"
-                  title="View on Solscan"
-                >
-                  <ExternalLink className="w-4 h-4 text-blue-400" />
-                </a>
-
                 {/* NFT Asset Viewer Button */}
                 {(auction.assetType === 'NFT' || auction.mintAddress) && (
                   <button

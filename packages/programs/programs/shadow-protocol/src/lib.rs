@@ -5,6 +5,7 @@ use anchor_spl::token::{Token, TokenAccount, Mint};
 mod instructions;
 mod state;
 mod error;
+mod crypto;
 
 use instructions::*;
 use state::*;
@@ -116,6 +117,15 @@ pub mod shadow_protocol {
         instructions::batch_settle(ctx, auction_ids, computation_offset)
     }
 
+    pub fn execute_settlement(
+        ctx: Context<ExecuteSettlement>,
+        auction_id: u64,
+        winner: Pubkey,
+        winning_amount: u64,
+    ) -> Result<()> {
+        instructions::execute_settlement(ctx, auction_id, winner, winning_amount)
+    }
+
     pub fn initialize_protocol(ctx: Context<InitializeProtocol>) -> Result<()> {
         instructions::initialize_protocol(ctx)
     }
@@ -144,9 +154,6 @@ pub mod shadow_protocol {
         instructions::cancel_authority_transfer(ctx)
     }
 
-    pub fn transfer_authority(ctx: Context<TransferAuthority>, new_authority: Pubkey) -> Result<()> {
-        instructions::transfer_authority(ctx, new_authority)
-    }
 
     pub fn arcium_callback(
         ctx: Context<ArciumCallback>,
@@ -154,6 +161,34 @@ pub mod shadow_protocol {
         result: Vec<u8>,
     ) -> Result<()> {
         instructions::arcium_callback(ctx, computation_id, result)
+    }
+
+    pub fn cleanup_expired_auction(
+        ctx: Context<CleanupExpiredAuction>,
+        auction_id: u64,
+    ) -> Result<()> {
+        instructions::cleanup_expired_auction(ctx, auction_id)
+    }
+
+    pub fn cleanup_expired_bids(
+        ctx: Context<CleanupExpiredBids>,
+        auction_id: u64,
+        bid_indices: Vec<u64>,
+    ) -> Result<()> {
+        instructions::cleanup_expired_bids(ctx, auction_id, bid_indices)
+    }
+
+    pub fn batch_cleanup_auctions(
+        ctx: Context<BatchCleanupAuctions>,
+        auction_ids: Vec<u64>,
+    ) -> Result<()> {
+        instructions::batch_cleanup_auctions(ctx, auction_ids)
+    }
+
+    pub fn reclaim_storage(
+        ctx: Context<ReclaimStorage>,
+    ) -> Result<()> {
+        instructions::reclaim_storage(ctx)
     }
 }
 

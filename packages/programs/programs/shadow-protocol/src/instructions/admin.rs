@@ -156,20 +156,6 @@ pub fn cancel_authority_transfer(ctx: Context<CancelAuthorityTransfer>) -> Resul
     Ok(())
 }
 
-pub fn transfer_authority(ctx: Context<TransferAuthority>, new_authority: Pubkey) -> Result<()> {
-    let protocol = &mut ctx.accounts.protocol_state;
-    
-    require!(
-        ctx.accounts.authority.key() == protocol.authority,
-        ShadowProtocolError::Unauthorized
-    );
-    
-    protocol.authority = new_authority;
-    
-    msg!("Authority transferred to {}", new_authority);
-    
-    Ok(())
-}
 
 #[derive(Accounts)]
 pub struct InitializeProtocol<'info> {
@@ -230,20 +216,6 @@ pub struct UpdateFeeRecipient<'info> {
     pub new_recipient: AccountInfo<'info>,
 }
 
-#[derive(Accounts)]
-pub struct TransferAuthority<'info> {
-    pub authority: Signer<'info>,
-    
-    #[account(
-        mut,
-        seeds = [PROTOCOL_SEED],
-        bump = protocol_state.bump
-    )]
-    pub protocol_state: Account<'info, ProtocolState>,
-    
-    /// CHECK: New authority account
-    pub new_authority: AccountInfo<'info>,
-}
 
 #[derive(Accounts)]
 pub struct InitiateAuthorityTransfer<'info> {

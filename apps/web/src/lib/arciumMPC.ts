@@ -137,15 +137,20 @@ async function executeMPCComputation(sessionId: string): Promise<string> {
 async function waitForMPCResult(computationId: string): Promise<MPCResult> {
   await simulateNetworkDelay(2000);
   
-  const mockResult: MPCResult = {
-    winner: generateMockWinner(),
-    winningAmount: Math.random() * 1 + 0.1, // Random amount between 0.1 and 1.1 SOL
-    rankings: generateMockRankings(),
+  // In production, this would fetch actual MPC computation results
+  // For now, we need to determine winner from actual bid data
+  console.log('MPC computation completed for:', computationId);
+  
+  // This will be replaced with actual MPC network integration
+  const result: MPCResult = {
+    winner: '', // Will be determined from actual bids
+    winningAmount: 0, // Will be determined from actual bids
+    rankings: [],
     computationProof: generateComputationProof(),
     timestamp: Date.now(),
   };
   
-  return mockResult;
+  return result;
 }
 
 function generateMPCShares(value: Uint8Array, numShares: number = 3): Uint8Array[] {
@@ -163,27 +168,6 @@ function generateMPCShares(value: Uint8Array, numShares: number = 3): Uint8Array
   return shares;
 }
 
-function generateMockWinner(): string {
-  const wallets = [
-    '7EYnhQoR9YM3N7UoaKRoA44Uy8JeaZV3qyouov87awMs',
-    '5FHwkrdxntdK24hgQU8qgBjn35Y1zwhz1GZwCkP2UJnM',
-    'DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL',
-  ];
-  return wallets[Math.floor(Math.random() * wallets.length)];
-}
-
-function generateMockRankings(): Array<{ bidder: string; rank: number }> {
-  const bidders = [
-    '7EYnhQoR9YM3N7UoaKRoA44Uy8JeaZV3qyouov87awMs',
-    '5FHwkrdxntdK24hgQU8qgBjn35Y1zwhz1GZwCkP2UJnM',
-    'DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL',
-  ];
-  
-  return bidders.map((bidder, index) => ({
-    bidder,
-    rank: index + 1,
-  }));
-}
 
 function generateComputationProof(): string {
   const chars = '0123456789abcdef';
