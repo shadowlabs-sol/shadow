@@ -355,8 +355,7 @@ export const WalletAuthButton: React.FC = () => {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log('🔔 Notifications button clicked from WalletAuthButton!!!');
-                        alert('🔔 Notifications panel would open here!');
+                        setShowNotificationsModal(true);
                         setDropdownOpen(false);
                       }}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20 rounded-xl transition-all border border-blue-500/20 hover:border-blue-500/40 group"
