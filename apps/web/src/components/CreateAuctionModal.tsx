@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, DollarSign, TrendingDown, Lock, Hash, FileText, Clock, Coins } from 'lucide-react';
+import { X, DollarSign, TrendingDown, Lock, FileText, Clock, Coins } from 'lucide-react';
 import { AssetSelector } from './AssetSelector';
 
 interface CreateAuctionModalProps {
