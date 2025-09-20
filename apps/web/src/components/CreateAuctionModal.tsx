@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, DollarSign, TrendingDown, Lock, Hash, FileText, Clock, Coins } from 'lucide-react';
+import { AssetSelector } from './AssetSelector';
 
 interface CreateAuctionModalProps {
   isOpen: boolean;
@@ -154,20 +155,10 @@ export const CreateAuctionModal: React.FC<CreateAuctionModalProps> = ({
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-300">
-                  <Hash className="w-4 h-4 text-purple-400" />
-                  Asset Mint Address
-                </label>
-                <input
-                  type="text"
-                  value={formData.assetMint}
-                  onChange={(e) => handleInputChange('assetMint', e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700/50 rounded-xl text-white placeholder-gray-500 focus:border-purple-500 focus:bg-gray-800/70 focus:outline-none transition-all font-mono text-sm"
-                  placeholder="Enter token mint address"
-                  required
-                />
-              </div>
+              <AssetSelector
+                selectedAsset={formData.assetMint}
+                onSelect={(mintAddress) => handleInputChange('assetMint', mintAddress)}
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">

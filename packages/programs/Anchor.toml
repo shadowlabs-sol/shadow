@@ -18,7 +18,7 @@ shadow_protocol = "GEK3zgEitHAE2djxDtSxi3Pm67kgAzTnLbMRfRurWiSK"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "devnet"
+cluster = "mainnet"
 wallet = "/home/vivek/projects/shadow/shadow-protocol/deployer-keypair.json"
 
 [scripts]
@@ -35,7 +35,7 @@ program = "tests/fixtures/metadata.so"
 
 [test.validator]
 bind_address = "0.0.0.0"
-url = "https://api.devnet.solana.com"
+url = "https://api.mainnet-beta.solana.com"
 clone = [
     { address = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", filename = "spl_token.so" },
     { address = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL", filename = "spl_associated_token.so" },

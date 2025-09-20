@@ -4,7 +4,7 @@ version = "0.1.0"
 
 [network]
 cluster_offset = 2326510166
-rpc_url = "https://api.devnet.solana.com"
+rpc_url = "https://mainnet.helius-rpc.com"
 localnet_rpc_url = "http://127.0.0.1:8899"
 
 [programs.shadow-protocol]
@@ -18,7 +18,7 @@ dutch_auction = "packages/programs/shadow-protocol/encrypted-ixs/dutch_auction.r
 batch_settlement = "packages/programs/shadow-protocol/encrypted-ixs/batch_settlement.rs"
 
 [provider]
-cluster = "devnet"
+cluster = "mainnet-beta"
 wallet = "/home/vivek/projects/shadow/shadow-protocol/deployer-keypair.json"
 
 [arcium]
