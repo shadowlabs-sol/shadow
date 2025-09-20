@@ -25,9 +25,6 @@ const AuctionManagementModal = dynamic(() => import('./AuctionManagementModal').
   loading: () => <div className="animate-pulse">Loading...</div>
 });
 
-const AuctionFlowIndicator = dynamic(() => import('./AuctionFlowIndicator').then(mod => ({ default: mod.AuctionFlowIndicator })), {
-  ssr: false
-});
 
 const SettlementNotification = dynamic(() => import('./SettlementNotification').then(mod => ({ default: mod.SettlementNotification })), {
   ssr: false
@@ -219,13 +216,38 @@ export const Dashboard: React.FC = () => {
     return () => clearInterval(checkSettlement);
   }, []);
 
-  const stats = {
-    totalAuctions: auctions.length,
-    activeAuctions: auctions.filter((a: any) => a.status === 'ACTIVE').length,
-    totalVolume: auctions.reduce((sum: number, a: any) => sum + (a.currentBid || 0), 0),
-    avgBidSize: auctions.length > 0 ? 
-      auctions.reduce((sum: number, a: any) => sum + (a.currentBid || 0), 0) / auctions.length : 0,
-  };
+  const stats = useMemo(() => {
+    const settledAuctions = auctions.filter((a: any) => a.status === 'SETTLED');
+    
+    const totalVolume = settledAuctions.reduce((sum: number, auction: any) => {
+      const winningAmount = parseFloat(auction.winningAmount || '0');
+      return sum + winningAmount;
+    }, 0);
+    
+    const totalBids = auctions.reduce((sum: number, auction: any) => {
+      return sum + (auction.bidCount || 0);
+    }, 0);
+    
+    const totalEstimatedValue = auctions.reduce((sum: number, auction: any) => {
+      if (auction.status === 'SETTLED' && auction.winningAmount) {
+        return sum + parseFloat(auction.winningAmount);
+      }
+      
+      if (auction.bidCount > 0) {
+        const minBid = parseFloat(auction.minimumBid || '0');
+        return sum + (minBid * auction.bidCount);
+      }
+      
+      return sum;
+    }, 0);
+
+    return {
+      totalAuctions: auctions.length,
+      activeAuctions: auctions.filter((a: any) => a.status === 'ACTIVE').length,
+      totalVolume,
+      avgBidSize: totalBids > 0 ? totalEstimatedValue / totalBids : 0,
+    };
+  }, [auctions]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -453,13 +475,13 @@ export const Dashboard: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard 
               icon={DollarSign} 
-              title="Total Volume" 
+              title="Total Volume Traded" 
               value={stats.totalVolume} 
-              prefix="$"
+              suffix=" SOL"
             />
             <StatCard 
               icon={Activity} 
-              title="Active Auctions" 
+              title="Live Auctions" 
               value={stats.activeAuctions} 
             />
             <StatCard 
@@ -469,26 +491,13 @@ export const Dashboard: React.FC = () => {
             />
             <StatCard 
               icon={TrendingUp} 
-              title="Avg Bid Size" 
-              value={Math.floor(stats.avgBidSize)} 
-              prefix="$"
+              title="Average Bid" 
+              value={stats.avgBidSize} 
+              suffix=" SOL"
             />
           </div>
         </motion.div>
 
-        {filteredAuctions.length > 0 && filteredAuctions[0].status === 'ACTIVE' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <AuctionFlowIndicator
-              status={filteredAuctions[0].status}
-              bidCount={filteredAuctions[0].bidCount || 0}
-              isEncrypted={true}
-            />
-          </motion.div>
-        )}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
