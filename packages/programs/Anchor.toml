@@ -6,19 +6,19 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-shadow_protocol = "GEK3zgEitHAE2djxDtSxi3Pm67kgAzTnLbMRfRurWiSK"
+shadow_protocol = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 
 [programs.devnet]
-shadow_protocol = "GEK3zgEitHAE2djxDtSxi3Pm67kgAzTnLbMRfRurWiSK"
+shadow_protocol = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 
 [programs.mainnet]
-shadow_protocol = "GEK3zgEitHAE2djxDtSxi3Pm67kgAzTnLbMRfRurWiSK"
+shadow_protocol = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "mainnet"
+cluster = "devnet"
 wallet = "/home/vivek/projects/shadow/shadow-protocol/deployer-keypair.json"
 
 [scripts]
@@ -35,7 +35,7 @@ program = "tests/fixtures/metadata.so"
 
 [test.validator]
 bind_address = "0.0.0.0"
-url = "https://api.mainnet-beta.solana.com"
+url = "https://api.devnet.solana.com"
 clone = [
     { address = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", filename = "spl_token.so" },
     { address = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL", filename = "spl_associated_token.so" },

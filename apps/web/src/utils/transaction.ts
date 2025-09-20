@@ -21,7 +21,7 @@ export function isRealTransaction(transactionHash: string | null | undefined): b
 /**
  * Get the appropriate Solscan URL for a transaction
  */
-export function getSolscanUrl(transactionHash: string, cluster: 'mainnet' | 'devnet' = 'mainnet'): string {
+export function getSolscanUrl(transactionHash: string, cluster: 'mainnet' | 'devnet' = 'devnet'): string {
   const clusterParam = cluster === 'mainnet' ? '' : '?cluster=devnet';
   return `https://solscan.io/tx/${transactionHash}${clusterParam}`;
 }
@@ -29,7 +29,7 @@ export function getSolscanUrl(transactionHash: string, cluster: 'mainnet' | 'dev
 /**
  * Get the appropriate Solscan URL for an account
  */
-export function getSolscanAccountUrl(accountAddress: string, cluster: 'mainnet' | 'devnet' = 'mainnet'): string {
+export function getSolscanAccountUrl(accountAddress: string, cluster: 'mainnet' | 'devnet' = 'devnet'): string {
   const clusterParam = cluster === 'mainnet' ? '' : '?cluster=devnet';
   return `https://solscan.io/account/${accountAddress}${clusterParam}`;
 }
@@ -37,7 +37,7 @@ export function getSolscanAccountUrl(accountAddress: string, cluster: 'mainnet' 
 /**
  * Get the appropriate Solscan URL for a token
  */
-export function getSolscanTokenUrl(tokenAddress: string, cluster: 'mainnet' | 'devnet' = 'mainnet'): string {
+export function getSolscanTokenUrl(tokenAddress: string, cluster: 'mainnet' | 'devnet' = 'devnet'): string {
   const clusterParam = cluster === 'mainnet' ? '' : '?cluster=devnet';
   return `https://solscan.io/token/${tokenAddress}${clusterParam}`;
 }

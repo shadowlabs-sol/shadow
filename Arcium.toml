@@ -3,12 +3,12 @@ name = "shadow-protocol"
 version = "0.1.0"
 
 [network]
-cluster_offset = 2326510166
-rpc_url = "https://mainnet.helius-rpc.com"
+cluster_offset = 
+rpc_url = "https://devnet.helius-rpc.com"
 localnet_rpc_url = "http://127.0.0.1:8899"
 
 [programs.shadow-protocol]
-address = "GEK3zgEitHAE2djxDtSxi3Pm67kgAzTnLbMRfRurWiSK"
+address = ""
 program = "packages/programs/shadow-protocol/target/deploy/shadow_protocol.so"
 idl = "apps/web/src/idl/shadow_protocol.json"
 
@@ -18,7 +18,7 @@ dutch_auction = "packages/programs/shadow-protocol/encrypted-ixs/dutch_auction.r
 batch_settlement = "packages/programs/shadow-protocol/encrypted-ixs/batch_settlement.rs"
 
 [provider]
-cluster = "mainnet-beta"
+cluster = "devnet"
 wallet = "/home/vivek/projects/shadow/shadow-protocol/deployer-keypair.json"
 
 [arcium]
