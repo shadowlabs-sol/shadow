@@ -8,7 +8,7 @@ rpc_url = "https://api.mainnet-beta.solana.com"
 localnet_rpc_url = "http://127.0.0.1:8899"
 
 [programs.shadow-protocol]
-address = "Apw2K9F8KRSgie4iS5ea82Vd3XwTtmojQfXPdbxYFCQm"
+address = "GEK3zgEitHAE2djxDtSxi3Pm67kgAzTnLbMRfRurWiSK"
 program = "packages/programs/shadow-protocol/target/deploy/shadow_protocol.so"
 idl = "apps/web/src/idl/shadow_protocol.json"
 

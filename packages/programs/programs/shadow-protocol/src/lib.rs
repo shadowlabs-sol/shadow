@@ -31,7 +31,7 @@ mod crypto;
 
 use instructions::*;
 
-declare_id!("Apw2K9F8KRSgie4iS5ea82Vd3XwTtmojQfXPdbxYFCQm");
+declare_id!("GEK3zgEitHAE2djxDtSxi3Pm67kgAzTnLbMRfRurWiSK");
 
 
 #[program]
@@ -173,7 +173,6 @@ pub mod shadow_protocol {
     pub fn cancel_authority_transfer(ctx: Context<CancelAuthorityTransfer>) -> Result<()> {
         instructions::cancel_authority_transfer(ctx)
     }
-
 
 
     pub fn cleanup_expired_auction(

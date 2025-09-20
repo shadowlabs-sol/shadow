@@ -20,9 +20,9 @@ idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
 [dependencies]
 anchor-lang = { version = "0.31.1", features = ["init-if-needed"] }
 anchor-spl = { version = "0.31.1" }
-arcium-anchor = { version = "0.2.0" }
-arcium-client = { version = "0.2.0" }
-arcium-macros = { version = "0.2.0" }
+# arcium-anchor = { version = "0.2.0" }
+# arcium-client = { version = "0.2.0" }
+# arcium-macros = { version = "0.2.0" }
 getrandom = { version = "0.2", features = ["custom"] }
 
 # BPF-specific overrides
