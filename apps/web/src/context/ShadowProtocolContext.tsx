@@ -238,7 +238,6 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
           // Create a simple transaction that will generate a real tx hash
           const { SystemProgram, Transaction, LAMPORTS_PER_SOL } = await import('@solana/web3.js');
           
-          // Create a simple transaction (like a memo or small transfer) to get real tx hash
           const transaction = new Transaction().add(
             SystemProgram.transfer({
               fromPubkey: publicKey,
@@ -247,16 +246,13 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
             })
           );
           
-          // Get recent blockhash
           const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
           transaction.recentBlockhash = blockhash;
           transaction.feePayer = publicKey;
           
-          // Sign and send transaction
           const signedTx = await signTransaction(transaction);
           const signature = await connection.sendRawTransaction(signedTx.serialize());
           
-          // Wait for confirmation
           await connection.confirmTransaction({
             signature,
             blockhash,
@@ -264,21 +260,18 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
           });
           
           transactionHash = signature;
-          console.log('Real transaction created:', transactionHash);
-          toast.success('🔗 Real blockchain transaction created!');
+          console.log('Transaction created:', transactionHash);
+          toast.success('🔗 Transaction created!');
           
         } catch (onchainError) {
-          console.warn('Real transaction failed, using development mode:', onchainError);
-          toast('📝 Running in development mode - no real blockchain transaction', { icon: '⚠️' });
-          // Fall back to using development mode without a real transaction
+          console.warn('Transaction failed, using development mode:', onchainError);
+          toast('📝 Running in development mode - no transaction', { icon: '⚠️' });
         }
       }
       
-      // Encrypt reserve price for database storage
       let reservePriceEncrypted: any;
       let nonce = randomBytes(16);
       
-      // Ensure reserve price has a default value
       const reservePrice = params.reservePrice || params.minimumBid || 0.01;
       
       try {
