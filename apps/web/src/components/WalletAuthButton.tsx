@@ -110,7 +110,7 @@ export const WalletAuthButton: React.FC = () => {
   const openExplorer = () => {
     if (publicKey) {
       window.open(
-        `https://explorer.solana.com/address/${publicKey.toBase58()}?cluster=devnet`,
+        `https://explorer.solana.com/address/${publicKey.toBase58()}`,
         '_blank'
       );
     }

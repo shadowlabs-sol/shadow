@@ -4,7 +4,7 @@ import { PublicKey, Connection } from '@solana/web3.js';
 import { verify } from '@noble/ed25519';
 
 const prisma = new PrismaClient();
-const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.devnet.solana.com');
+const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://mainnet.helius-rpc.com');
 
 /**
  * Arcium Callback Server

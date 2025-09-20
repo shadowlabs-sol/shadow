@@ -4,7 +4,7 @@ import { PublicKey } from '@solana/web3.js';
 export const SHADOW_PROTOCOL_PROGRAM_ID = 'ShadowProtocol11111111111111111111111111111';
 
 // Arcium Network Constants
-export const DEFAULT_CLUSTER_OFFSET = 1116522165; // Devnet cluster
+export const DEFAULT_CLUSTER_OFFSET = 2326510166; // Mainnet cluster
 export const ARCIUM_PROGRAM_ID = new PublicKey('ArciumProgram11111111111111111111111111111');
 
 // PDA Seeds
@@ -16,8 +16,8 @@ export const BATCH_SEED = 'batch';
 export const MXE_SEED = 'mxe';
 
 // Network Configuration
-export const SOLANA_RPC_ENDPOINT = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.devnet.solana.com';
-export const ARCIUM_CLUSTER_OFFSET = parseInt(process.env.NEXT_PUBLIC_ARCIUM_CLUSTER_OFFSET || '1116522165');
+export const SOLANA_RPC_ENDPOINT = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://mainnet.helius-rpc.com';
+export const ARCIUM_CLUSTER_OFFSET = parseInt(process.env.NEXT_PUBLIC_ARCIUM_CLUSTER_OFFSET || '2326510166');
 
 // Transaction Limits
 export const MAX_BIDS_PER_AUCTION = 1000;

@@ -426,7 +426,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                     value={settings.advanced.rpcEndpoint}
                     onChange={(e) => updateSetting(['advanced', 'rpcEndpoint'], e.target.value)}
                     className="w-full px-3 py-2 bg-[var(--secondary)] border border-[var(--border)] rounded-lg text-[var(--foreground)] focus:border-[var(--primary)] focus:outline-none"
-                    placeholder="https://api.devnet.solana.com"
+                    placeholder="https://mainnet.helius-rpc.com"
                   />
                 </div>
 

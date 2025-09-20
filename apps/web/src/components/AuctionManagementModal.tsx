@@ -302,7 +302,7 @@ export const AuctionManagementModal: React.FC<AuctionManagementModalProps> = ({
                             <div className="flex items-center gap-2">
                               <span className="font-mono text-gray-400">{auction.auctionAccount.slice(0, 12)}...</span>
                               <a
-                                href={`https://solscan.io/account/${auction.auctionAccount}?cluster=devnet`}
+                                href={`https://solscan.io/account/${auction.auctionAccount}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="p-1 hover:bg-gray-600/20 rounded transition-colors"

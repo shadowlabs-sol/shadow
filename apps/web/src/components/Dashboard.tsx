@@ -663,7 +663,7 @@ export const Dashboard: React.FC = () => {
                   <span className="text-white/80">Address</span>
                   {publicKey ? (
                     <a
-                      href={`https://solscan.io/account/${publicKey.toString()}?cluster=devnet`}
+                      href={`https://solscan.io/account/${publicKey.toString()}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-bold font-mono text-xs text-white hover:text-purple-200 transition-colors flex items-center gap-1"
@@ -679,7 +679,7 @@ export const Dashboard: React.FC = () => {
                 <div className="flex justify-between">
                   <span className="text-white/80">Network</span>
                   <a
-                    href="https://solscan.io/?cluster=devnet"
+                    href="https://solscan.io/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-bold text-white hover:text-purple-200 transition-colors flex items-center gap-1"

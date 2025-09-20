@@ -257,7 +257,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auction, onBid, onSett
                       <div>
                         <p className="text-[10px] text-purple-400">Winner</p>
                         <a
-                          href={`https://solscan.io/account/${auction.winner}?cluster=devnet`}
+                          href={`https://solscan.io/account/${auction.winner}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs font-mono text-white hover:text-purple-300 transition-colors"
