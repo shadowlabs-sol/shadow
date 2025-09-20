@@ -3,8 +3,8 @@ name = "shadow-protocol"
 version = "0.1.0"
 
 [network]
-cluster_offset = 1116522165
-rpc_url = "https://api.mainnet-beta.solana.com"
+cluster_offset = 2326510166
+rpc_url = "https://api.devnet.solana.com"
 localnet_rpc_url = "http://127.0.0.1:8899"
 
 [programs.shadow-protocol]
@@ -18,8 +18,8 @@ dutch_auction = "packages/programs/shadow-protocol/encrypted-ixs/dutch_auction.r
 batch_settlement = "packages/programs/shadow-protocol/encrypted-ixs/batch_settlement.rs"
 
 [provider]
-cluster = "mainnet-beta"
-wallet = "~/.config/solana/id.json"
+cluster = "devnet"
+wallet = "/home/vivek/projects/shadow/shadow-protocol/deployer-keypair.json"
 
 [arcium]
 endpoint = "https://testnet-api.arcium.com"
