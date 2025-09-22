@@ -211,7 +211,7 @@ export default function Home() {
           >
             <a href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-all hover:scale-105">Features</a>
             <a href="#how" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-all hover:scale-105">How it Works</a>
-            <a href="#stats" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-all hover:scale-105">Stats</a>
+            <a href="/docs" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-all hover:scale-105">Docs</a>
             <motion.a 
               href="/app" 
               className="relative px-6 py-2.5 text-sm font-semibold overflow-hidden rounded-full group"
@@ -595,8 +595,9 @@ export default function Home() {
               <h4 className="font-semibold mb-3">Product</h4>
               <div className="space-y-2">
                 <a href="/app" className="block text-sm text-gray-600 hover:text-purple-600 transition-colors">Launch App</a>
-                <a href="#" className="block text-sm text-gray-600 hover:text-purple-600 transition-colors">Documentation</a>
-                <a href="#" className="block text-sm text-gray-600 hover:text-purple-600 transition-colors">API Reference</a>
+                <a href="/docs" className="block text-sm text-gray-600 hover:text-purple-600 transition-colors">Documentation</a>
+                <a href="/docs/api-reference" className="block text-sm text-gray-600 hover:text-purple-600 transition-colors">API Reference</a>
+                <a href="/docs/examples" className="block text-sm text-gray-600 hover:text-purple-600 transition-colors">Examples</a>
               </div>
             </div>
             
