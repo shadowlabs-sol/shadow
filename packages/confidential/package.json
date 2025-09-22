@@ -3,10 +3,10 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-      "build": "echo 'Arcium CLI required for build'",
-      "test": "echo 'Arcium CLI required for test'",
+      "build": "arcium build",
+      "test": "arcium test",
       "clean": "rm -rf target",
-      "deploy": "echo 'Arcium CLI required for deploy'"
+      "deploy": "arcium deploy"
     },
     "devDependencies": {
       "@types/node": "^20.0.0",

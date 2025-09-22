@@ -1,5 +1,5 @@
 [package]
-name = "shadow-protocol-confidential"
+name = "encrypted-ixs"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,3 +10,4 @@ crate-type = ["cdylib", "lib"]
 arcis-imports = { workspace = true }
 arcium-macros = { workspace = true }
 arcium-anchor = { workspace = true }
+arcis = "0.1.47"

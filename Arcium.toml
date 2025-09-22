@@ -3,7 +3,7 @@ name = "shadow-protocol"
 version = "0.1.0"
 
 [network]
-cluster_offset = 
+cluster_offset = 0
 rpc_url = "https://devnet.helius-rpc.com"
 localnet_rpc_url = "http://127.0.0.1:8899"
 
@@ -11,11 +11,6 @@ localnet_rpc_url = "http://127.0.0.1:8899"
 address = ""
 program = "packages/programs/shadow-protocol/target/deploy/shadow_protocol.so"
 idl = "apps/web/src/idl/shadow_protocol.json"
-
-[encrypted_instructions]
-sealed_bid_auction = "packages/programs/shadow-protocol/encrypted-ixs/sealed_bid_auction.rs"
-dutch_auction = "packages/programs/shadow-protocol/encrypted-ixs/dutch_auction.rs"
-batch_settlement = "packages/programs/shadow-protocol/encrypted-ixs/batch_settlement.rs"
 
 [provider]
 cluster = "devnet"

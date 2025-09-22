@@ -6,8 +6,7 @@ import {
     TransactionSignature,
   } from '@solana/web3.js';
   import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor';
-  import { RescueCipher, getArciumEnv, x25519 } from '@arcium-hq/client';
-  import { randomBytes } from 'crypto';
+  import { RescueCipher, x25519 } from '@arcium-hq/client';
   
   import { AuctionManager } from './auction/AuctionManager';
   import { BidManager } from './auction/BidManager';
@@ -53,7 +52,7 @@ import {
       this.bidManager = new BidManager(this.program, this.connection);
       this.encryptionManager = new EncryptionManager(
         config.arciumClusterPubkey || '',
-        config.clusterOffset || DEFAULT_CLUSTER_OFFSET,
+        this.connection,
         config.mxePublicKey
       );
     }

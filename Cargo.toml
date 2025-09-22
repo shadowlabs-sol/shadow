@@ -1,14 +1,20 @@
 [workspace]
+resolver = "2"
 members = [
-    "confidential-ixs"
+    "encrypted-ixs",
+    "packages/programs/programs/shadow-protocol"
 ]
 
 [workspace.dependencies]
+anchor-lang = "0.31.0"
+anchor-spl = "0.31.0"
+solana-program = "1.18.0"
+borsh = "0.10.3"
+thiserror = "1.0.0"
+arrayref = "0.3.6"
 arcium-macros = "0.2.0"
 arcium-anchor = "0.2.0"
-
-[profile.dev]
-lto = false
+arcis-imports = "0.1.0"
 
 [profile.release]
 overflow-checks = true

@@ -1,11 +1,5 @@
 use arcis_imports::*;
 
-pub mod auctions;
-pub mod settlement;
-
-pub use auctions::*;
-pub use settlement::*;
-
 #[derive(ArcisType, Copy, Clone, ArcisEncryptable)]
 pub struct EncryptedBid {
     /// Bid amount (encrypted)
@@ -68,10 +62,15 @@ fn sealed_bid_auction(
     
     let mut actual_bid_count: mu64 = 0.into();
     
-    // Decrypt each bid (assuming each bid has its own nonce pattern)
+    // Decrypt each bid
     for i in 0..64 {
         if i < bid_count as usize {
-            let bid_cipher = RescueCipher::new_with_client(/* bidder_public_key */);
+            let bid_nonce = (auction_nonce + (i as u128)) as u128;
+            let bid_cipher = RescueCipher::new_for_mxe();
+            valid_bids[i] = bid_cipher.decrypt::<4, EncryptedBid>(
+                [bids[i * 4], bids[i * 4 + 1], bids[i * 4 + 2], bids[i * 4 + 3]], 
+                bid_nonce
+            );
             actual_bid_count = actual_bid_count + 1.into();
         }
     }
