@@ -509,7 +509,7 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
       const allBids = await bidsResponse.json();
       
       // Import Arcium MPC module
-      const { determineWinnerMPC, verifyMPCProof } = await import('@/lib/arciumMPC');
+      const { pollComputationResult, verifyComputationProof } = await import('@/lib/arciumMPC');
       
       // Prepare encrypted bids for MPC
       const encryptedBids = allBids.map((bid: any) => ({
