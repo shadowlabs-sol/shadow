@@ -1,18 +1,11 @@
-/**
- * Arcium MPC Integration for Shadow Protocol
- * 
- * This module handles the integration with Arcium Network for secure
- * Multi-Party Computation (MPC) to determine auction winners without
- * revealing individual bid amounts.
- */
+import { PublicKey, Connection, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
+import { RescueCipher, x25519 } from '@arcium-hq/client';
 
-import { PublicKey } from '@solana/web3.js';
-
-// Arcium Testnet configuration (works with Solana mainnet)
 const ARCIUM_CONFIG = {
-  networkUrl: process.env.NEXT_PUBLIC_ARCIUM_URL || 'https://testnet-api.arcium.com',
-  apiKey: process.env.NEXT_PUBLIC_ARCIUM_API_KEY || 'test-key',
-  timeout: 30000,
+  clusterEndpoint: process.env.NEXT_PUBLIC_ARCIUM_CLUSTER_ENDPOINT || 'https://testnet-api.arcium.com',
+  mxeProgramId: new PublicKey(process.env.NEXT_PUBLIC_MXE_PROGRAM_ID || 'MxeProgramPubkeyGoesHere11111111111111111111'),
+  computationGas: 1000000,
 };
 
 export interface EncryptedBid {
@@ -21,6 +14,7 @@ export interface EncryptedBid {
   nonce: Uint8Array;
   publicKey: Uint8Array;
   timestamp: number;
+  sharedSecret: Uint8Array;
 }
 
 export interface MPCResult {
@@ -31,180 +25,235 @@ export interface MPCResult {
     rank: number;
   }>;
   computationProof: string;
+  computationId: string;
   timestamp: number;
 }
 
-/**
- * Submit encrypted bids to Arcium MPC network for winner determination
- * 
- * @param auctionId - The auction identifier
- * @param encryptedBids - Array of encrypted bids
- * @param reservePrice - The encrypted reserve price
- * @returns The MPC computation result with winner details
- */
-export async function determineWinnerMPC(
+export interface MXECluster {
+  publicKey: Uint8Array;
+  address: PublicKey;
+  endpoint: string;
+}
+
+export async function initializeMXECluster(connection: Connection): Promise<MXECluster> {
+  const mxeAccount = await connection.getAccountInfo(ARCIUM_CONFIG.mxeProgramId);
+  if (!mxeAccount) {
+    throw new Error('MXE program account not found');
+  }
+
+  const mxePublicKey = mxeAccount.data.slice(0, 32);
+  
+  return {
+    publicKey: mxePublicKey,
+    address: ARCIUM_CONFIG.mxeProgramId,
+    endpoint: ARCIUM_CONFIG.clusterEndpoint
+  };
+}
+
+export async function queueAuctionComputation(
+  provider: AnchorProvider,
+  program: Program,
   auctionId: string,
   encryptedBids: EncryptedBid[],
-  reservePrice: Uint8Array
-): Promise<MPCResult> {
-  try {
-    console.log('🔐 Initiating Arcium MPC computation for auction:', auctionId);
-    console.log('📊 Processing', encryptedBids.length, 'encrypted bids');
-
-    // Step 1: Initialize MPC session
-    const sessionId = await initializeMPCSession(auctionId);
-    console.log('✅ MPC session initialized:', sessionId);
-
-    // Step 2: Submit encrypted bids to MPC nodes
-    await submitBidsToMPC(sessionId, encryptedBids);
-    console.log('✅ Bids submitted to MPC network');
-
-    // Step 3: Submit reserve price
-    await submitReservePriceToMPC(sessionId, reservePrice);
-    console.log('✅ Reserve price submitted');
-
-    // Step 4: Execute MPC computation
-    const computationId = await executeMPCComputation(sessionId);
-    console.log('⚡ MPC computation started:', computationId);
-
-    // Step 5: Wait for and retrieve results
-    const result = await waitForMPCResult(computationId);
-    console.log('🎉 MPC computation complete:', result);
-
-    return result;
-  } catch (error) {
-    console.error('❌ MPC computation failed:', error);
-    throw new Error('Failed to determine winner through Arcium MPC');
-  }
-}
-
-async function initializeMPCSession(auctionId: string): Promise<string> {
-  await simulateNetworkDelay();
-  
-  const sessionId = `mpc_session_${auctionId}_${Date.now()}`;
-  
-  const sessionData = {
+  encryptedReservePrice: Uint8Array,
+  mxeCluster: MXECluster
+): Promise<string> {
+  const computationInstruction = await createComputationInstruction(
+    program,
     auctionId,
-    createdAt: Date.now(),
-    status: 'initialized',
-    nodes: ['node1.arcium.network', 'node2.arcium.network', 'node3.arcium.network'],
+    encryptedBids,
+    encryptedReservePrice,
+    mxeCluster
+  );
+
+  const transaction = new Transaction().add(computationInstruction);
+  const signature = await provider.sendAndConfirm(transaction);
+  return signature;
+}
+
+async function createComputationInstruction(
+  program: Program,
+  auctionId: string,
+  encryptedBids: EncryptedBid[],
+  encryptedReservePrice: Uint8Array,
+  mxeCluster: MXECluster
+): Promise<TransactionInstruction> {
+  
+  const computationData = {
+    auctionId: parseInt(auctionId),
+    bidsCount: encryptedBids.length,
+    encryptedBids: encryptedBids.map(bid => ({
+      bidder: new PublicKey(bid.bidder),
+      encryptedAmount: Array.from(bid.encryptedAmount),
+      nonce: Array.from(bid.nonce),
+      publicKey: Array.from(bid.publicKey)
+    })),
+    encryptedReservePrice: Array.from(encryptedReservePrice),
+    mxeCluster: mxeCluster.address,
+    gasLimit: ARCIUM_CONFIG.computationGas
   };
-  
-  console.log('MPC Session initialized:', sessionData);
-  return sessionId;
+
+  return await program.methods
+    .queueComputation(computationData)
+    .accounts({
+      mxeProgram: ARCIUM_CONFIG.mxeProgramId,
+    })
+    .instruction();
 }
 
-async function submitBidsToMPC(
-  sessionId: string,
-  encryptedBids: EncryptedBid[]
-): Promise<void> {
-  await simulateNetworkDelay();
+export async function encryptBidForMXE(
+  bidAmount: number,
+  bidder: PublicKey,
+  mxeCluster: MXECluster
+): Promise<EncryptedBid> {
+  const privateKey = x25519.utils.randomPrivateKey();
+  const publicKey = x25519.getPublicKey(privateKey);
+  const sharedSecret = x25519.getSharedSecret(privateKey, mxeCluster.publicKey);
+  const cipher = new RescueCipher(sharedSecret);
+  const nonce = crypto.getRandomValues(new Uint8Array(16));
   
-  // Simulate bid share generation for MPC
-  for (const bid of encryptedBids) {
-    const shares = generateMPCShares(bid.encryptedAmount);
-    console.log(`Generated ${shares.length} shares for bidder ${bid.bidder.slice(0, 8)}...`);
-  }
-}
-
-async function submitReservePriceToMPC(
-  sessionId: string,
-  reservePrice: Uint8Array
-): Promise<void> {
-  await simulateNetworkDelay();
+  const plaintext = [BigInt(bidAmount)];
+  const ciphertext = cipher.encrypt(plaintext, nonce);
   
-  const shares = generateMPCShares(reservePrice);
-  console.log(`Reserve price distributed across ${shares.length} MPC nodes`);
-}
-
-async function executeMPCComputation(sessionId: string): Promise<string> {
-  await simulateNetworkDelay();
-  
-  const computationId = `comp_${sessionId}_${Date.now()}`;
-  
-  console.log('MPC Protocol executing:');
-  console.log('- Phase 1: Share verification');
-  await simulateNetworkDelay(500);
-  console.log('- Phase 2: Secure comparison');
-  await simulateNetworkDelay(500);
-  console.log('- Phase 3: Winner determination');
-  await simulateNetworkDelay(500);
-  console.log('- Phase 4: Result aggregation');
-  
-  return computationId;
-}
-
-async function waitForMPCResult(computationId: string): Promise<MPCResult> {
-  await simulateNetworkDelay(2000);
-  
-  // In production, this would fetch actual MPC computation results
-  // For now, we need to determine winner from actual bid data
-  console.log('MPC computation completed for:', computationId);
-  
-  // This will be replaced with actual MPC network integration
-  const result: MPCResult = {
-    winner: '', // Will be determined from actual bids
-    winningAmount: 0, // Will be determined from actual bids
-    rankings: [],
-    computationProof: generateComputationProof(),
+  return {
+    bidder: bidder.toString(),
+    encryptedAmount: new Uint8Array(ciphertext[0] as number[]),
+    nonce,
+    publicKey,
     timestamp: Date.now(),
+    sharedSecret
   };
-  
-  return result;
 }
 
-function generateMPCShares(value: Uint8Array, numShares: number = 3): Uint8Array[] {
-  const shares: Uint8Array[] = [];
+export async function encryptReservePriceForMXE(
+  reservePrice: number,
+  mxeCluster: MXECluster
+): Promise<{ encryptedPrice: Uint8Array; nonce: Uint8Array; publicKey: Uint8Array }> {
+  const privateKey = x25519.utils.randomPrivateKey();
+  const publicKey = x25519.getPublicKey(privateKey);
+  const sharedSecret = x25519.getSharedSecret(privateKey, mxeCluster.publicKey);
+  const cipher = new RescueCipher(sharedSecret);
+  const nonce = crypto.getRandomValues(new Uint8Array(16));
   
-  for (let i = 0; i < numShares; i++) {
-    const share = new Uint8Array(value.length);
-    // Simple XOR-based sharing for demo
-    for (let j = 0; j < value.length; j++) {
-      share[j] = value[j] ^ (i + 1);
+  const plaintext = [BigInt(reservePrice)];
+  const ciphertext = cipher.encrypt(plaintext, nonce);
+  
+  return {
+    encryptedPrice: new Uint8Array(ciphertext[0] as number[]),
+    nonce,
+    publicKey
+  };
+}
+
+export async function pollComputationResult(
+  connection: Connection,
+  computationSignature: string,
+  maxAttempts: number = 30,
+  intervalMs: number = 2000
+): Promise<MPCResult> {
+  let attempts = 0;
+  
+  while (attempts < maxAttempts) {
+    const status = await connection.getSignatureStatus(computationSignature);
+    
+    if (status.value?.confirmationStatus === 'finalized') {
+      const transaction = await connection.getTransaction(computationSignature, {
+        commitment: 'finalized'
+      });
+      
+      if (transaction?.meta?.logMessages) {
+        const result = parseComputationResult(transaction.meta.logMessages);
+        if (result) {
+          return result;
+        }
+      }
     }
-    shares.push(share);
+    
+    attempts++;
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
   }
   
-  return shares;
+  throw new Error('Computation result polling timeout');
 }
 
-
-function generateComputationProof(): string {
-  const chars = '0123456789abcdef';
-  let proof = '0x';
-  for (let i = 0; i < 64; i++) {
-    proof += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return proof;
+function parseComputationResult(logs: string[]): MPCResult | null {
+  const resultLog = logs.find(log => log.includes('MPC_COMPUTATION_RESULT'));
+  if (!resultLog) return null;
+  
+  const resultData = resultLog.split('MPC_COMPUTATION_RESULT:')[1];
+  const parsed = JSON.parse(resultData);
+  
+  return {
+    winner: parsed.winner,
+    winningAmount: parsed.winningAmount,
+    rankings: parsed.rankings || [],
+    computationProof: parsed.proof,
+    computationId: parsed.computationId,
+    timestamp: Date.now()
+  };
 }
 
-function simulateNetworkDelay(ms: number = 1000): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-export async function verifyMPCProof(
+export async function verifyComputationProof(
   proof: string,
-  winner: string,
-  auctionId: string
+  computationId: string,
+  mxeCluster: MXECluster
 ): Promise<boolean> {
-  console.log('🔍 Verifying MPC proof:', proof.slice(0, 10) + '...');
+  const proofBytes = Buffer.from(proof, 'hex');
+  const computationIdBytes = Buffer.from(computationId, 'hex');
   
-  await simulateNetworkDelay(500);
-  
-  console.log('✅ MPC proof verified successfully');
-  return true;
+  return proofBytes.length === 64 && computationIdBytes.length === 32;
 }
 
-export async function getMPCStatus(computationId: string): Promise<{
+export async function getComputationStatus(
+  connection: Connection,
+  computationSignature: string
+): Promise<{
   status: 'pending' | 'processing' | 'completed' | 'failed';
   progress: number;
   message: string;
 }> {
-  await simulateNetworkDelay(200);
+  const status = await connection.getSignatureStatus(computationSignature);
   
-  return {
-    status: 'completed',
-    progress: 100,
-    message: 'MPC computation completed successfully',
-  };
+  if (!status.value) {
+    return {
+      status: 'pending',
+      progress: 0,
+      message: 'Computation queued'
+    };
+  }
+  
+  if (status.value.err) {
+    return {
+      status: 'failed',
+      progress: 0,
+      message: 'Computation failed'
+    };
+  }
+  
+  switch (status.value.confirmationStatus) {
+    case 'processed':
+      return {
+        status: 'processing',
+        progress: 50,
+        message: 'MPC computation in progress'
+      };
+    case 'confirmed':
+      return {
+        status: 'processing',
+        progress: 75,
+        message: 'Computation confirmed, finalizing...'
+      };
+    case 'finalized':
+      return {
+        status: 'completed',
+        progress: 100,
+        message: 'Computation completed'
+      };
+    default:
+      return {
+        status: 'pending',
+        progress: 25,
+        message: 'Processing transaction'
+      };
+  }
 }
