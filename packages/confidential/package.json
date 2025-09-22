@@ -3,10 +3,10 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-      "build": "arcium build",
-      "test": "arcium test",
+      "build": "cargo build",
+      "test": "cargo test",
       "clean": "rm -rf target",
-      "deploy": "arcium deploy"
+      "deploy": "echo 'Deploy with arcium deploy'"
     },
     "devDependencies": {
       "@types/node": "^20.0.0",

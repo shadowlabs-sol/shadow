@@ -1,4 +1,5 @@
 [workspace]
+resolver = "2"
 members = [
     "confidential-ixs"
 ]
@@ -6,6 +7,8 @@ members = [
 [workspace.dependencies]
 arcium-macros = "0.2.0"
 arcium-anchor = "0.2.0"
+arcis-imports = "0.1.47"
+arcis = "0.1.47"
 
 [profile.dev]
 lto = false
