@@ -6,20 +6,20 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-shadow_protocol = "FWijhahQvD6XaUYaRueUuunaZbYe9wPbKkALNf3eyvgj"
+shadow_protocol = "DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8"
 
 [programs.devnet]
-shadow_protocol = "FWijhahQvD6XaUYaRueUuunaZbYe9wPbKkALNf3eyvgj"
+shadow_protocol = "DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8"
 
 [programs.mainnet]
-shadow_protocol = "FWijhahQvD6XaUYaRueUuunaZbYe9wPbKkALNf3eyvgj"
+shadow_protocol = "DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
 cluster = "devnet"
-wallet = "./mxe-deployer.json"
+wallet = "./program-keypair.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
