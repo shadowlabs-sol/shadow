@@ -17,6 +17,14 @@ import {
   Pause
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
+import { 
+  fetchMetadata,
+  findMetadataPda,
+  deserializeMetadata 
+} from '@metaplex-foundation/mpl-token-metadata';
+import { publicKey } from '@metaplex-foundation/umi';
+import { Connection } from '@solana/web3.js';
 
 interface NFTMetadata {
   name?: string;
@@ -56,7 +64,6 @@ export const NFTAssetViewer: React.FC<NFTAssetViewerProps> = ({
   const [imageLoading, setImageLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Fetch NFT metadata if not provided
   useEffect(() => {
     if (!providedMetadata && mintAddress && isOpen) {
       fetchNFTMetadata();
@@ -70,22 +77,46 @@ export const NFTAssetViewer: React.FC<NFTAssetViewerProps> = ({
     setError(null);
 
     try {
-      // TODO: Implement real NFT metadata fetching using Metaplex or similar
-      // This would fetch actual metadata from the blockchain
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const connection = new Connection(process.env.NEXT_PUBLIC_RPC_URL || 'https://api.devnet.solana.com');
+      const umi = createUmi(connection);
+      
+      const mintPublicKey = publicKey(mintAddress);
+      const metadataPda = findMetadataPda(umi, { mint: mintPublicKey });
+      
+      const metadataAccount = await fetchMetadata(umi, metadataPda);
+      
+      if (!metadataAccount) {
+        throw new Error('No metadata found for this token');
+      }
 
-      // For now, show basic information until proper NFT integration is implemented
-      const basicMetadata: NFTMetadata = {
-        name: `Token ${mintAddress.slice(0, 8)}...`,
-        description: "NFT metadata loading requires Metaplex integration. This shows basic token information.",
-        external_url: `https://solscan.io/token/${mintAddress}`,
-        attributes: [
-          { trait_type: "Token Address", value: mintAddress },
-          { trait_type: "Status", value: "Metadata Pending" }
-        ]
+      let externalMetadata: any = {};
+      
+      if (metadataAccount.uri) {
+        try {
+          const response = await fetch(metadataAccount.uri);
+          if (response.ok) {
+            externalMetadata = await response.json();
+          }
+        } catch (fetchError) {
+          console.warn('Failed to fetch external metadata:', fetchError);
+        }
+      }
+
+      const metadata: NFTMetadata = {
+        name: metadataAccount.name || externalMetadata.name || `Token ${mintAddress.slice(0, 8)}...`,
+        description: externalMetadata.description || 'NFT from Solana blockchain',
+        image: externalMetadata.image,
+        animation_url: externalMetadata.animation_url,
+        external_url: externalMetadata.external_url,
+        attributes: externalMetadata.attributes || [
+          { trait_type: "Mint Address", value: mintAddress },
+          { trait_type: "Symbol", value: metadataAccount.symbol || 'Unknown' },
+          { trait_type: "Update Authority", value: metadataAccount.updateAuthority.toString() }
+        ],
+        properties: externalMetadata.properties
       };
 
-      setMetadata(basicMetadata);
+      setMetadata(metadata);
     } catch (err) {
       setError("Failed to load NFT metadata");
       console.error("Error fetching NFT metadata:", err);
@@ -198,7 +229,6 @@ export const NFTAssetViewer: React.FC<NFTAssetViewerProps> = ({
           onClick={(e) => e.stopPropagation()}
           className="relative w-full max-w-2xl max-h-[90vh] overflow-auto bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-black/95 backdrop-blur-xl rounded-2xl border border-white/[0.08]"
         >
-          {/* Header */}
           <div className="sticky top-0 z-10 flex items-center justify-between p-6 border-b border-white/[0.06] bg-black/20 backdrop-blur-sm">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-purple-600/20 rounded-lg">
@@ -221,7 +251,6 @@ export const NFTAssetViewer: React.FC<NFTAssetViewerProps> = ({
             </button>
           </div>
 
-          {/* Content */}
           <div className="p-6">
             {loading ? (
               <div className="flex items-center justify-center py-12">
@@ -245,12 +274,10 @@ export const NFTAssetViewer: React.FC<NFTAssetViewerProps> = ({
               </div>
             ) : metadata ? (
               <div className="space-y-6">
-                {/* Media */}
                 <div className="bg-black/20 rounded-lg p-4">
                   {renderMedia()}
                 </div>
 
-                {/* Metadata */}
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-xl font-bold text-white mb-2">
@@ -263,7 +290,6 @@ export const NFTAssetViewer: React.FC<NFTAssetViewerProps> = ({
                     )}
                   </div>
 
-                  {/* Attributes */}
                   {metadata.attributes && metadata.attributes.length > 0 && (
                     <div>
                       <h4 className="text-lg font-semibold text-white mb-3">Attributes</h4>
@@ -285,7 +311,6 @@ export const NFTAssetViewer: React.FC<NFTAssetViewerProps> = ({
                     </div>
                   )}
 
-                  {/* Links */}
                   <div className="flex gap-3">
                     {metadata.external_url && (
                       <a
