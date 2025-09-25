@@ -12,9 +12,6 @@ shadow_protocol = "DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8"
 [programs.devnet]
 shadow_protocol = "DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8"
 
-[programs.mainnet]
-shadow_protocol = "DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8"
-
 [provider]
 cluster = "devnet"
 wallet = "./program-keypair.json"
