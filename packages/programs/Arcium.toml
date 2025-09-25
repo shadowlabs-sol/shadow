@@ -6,7 +6,7 @@ localnet_timeout_secs = 60
 
 [devnet]
 # Cluster offset for devnet deployment
-cluster_offset = 1116522165
+cluster_offset = 2326510165
 # RPC URL for devnet
 rpc_url = "https://api.devnet.solana.com"
 

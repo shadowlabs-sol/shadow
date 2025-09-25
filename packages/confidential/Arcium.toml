@@ -7,14 +7,14 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-shadow_protocol = "ShadowProtocol11111111111111111111111111111"
+shadow_protocol = "DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8"
 
 [programs.devnet]
-shadow_protocol = "ShadowProtocol11111111111111111111111111111"
+shadow_protocol = "DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8"
 
 [provider]
 cluster = "devnet"
-wallet = "~/.config/solana/id.json"
+wallet = "../programs/program-keypair.json"
 
 [scripts]
 test = "yarn test"

@@ -6,20 +6,20 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-shadow_protocol_confidential = "ShadowProtocol11111111111111111111111111111"
+shadow_protocol_confidential = "DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8"
 
 [programs.devnet]
-shadow_protocol_confidential = "ShadowProtocol11111111111111111111111111111"
+shadow_protocol_confidential = "DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8"
 
 [programs.mainnet]
-shadow_protocol_confidential = "ShadowProtocol11111111111111111111111111111"
+shadow_protocol_confidential = "DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
 cluster = "devnet"
-wallet = "/home/vivek/projects/shadow/shadow-protocol/deployer-keypair.json"
+wallet = "../programs/program-keypair.json"
 
 [scripts]
 test = "echo 'No tests'"

@@ -31,7 +31,7 @@ mod crypto;
 
 use instructions::*;
 
-declare_id!("GEK3zgEitHAE2djxDtSxi3Pm67kgAzTnLbMRfRurWiSK");
+declare_id!("DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8");
 
 
 #[program]
@@ -155,6 +155,24 @@ pub mod shadow_protocol {
         result: Vec<u8>,
     ) -> Result<()> {
         instructions::arcium_callback(ctx, computation_id, result)
+    }
+
+    pub fn init_sealed_bid_comp_def(
+        ctx: Context<InitSealedBidCompDef>,
+    ) -> Result<()> {
+        instructions::init_sealed_bid_comp_def(ctx)
+    }
+
+    pub fn init_dutch_auction_comp_def(
+        ctx: Context<InitDutchAuctionCompDef>,
+    ) -> Result<()> {
+        instructions::init_dutch_auction_comp_def(ctx)
+    }
+
+    pub fn init_batch_settlement_comp_def(
+        ctx: Context<InitBatchSettlementCompDef>,
+    ) -> Result<()> {
+        instructions::init_batch_settlement_comp_def(ctx)
     }
 
     pub fn batch_settle(
