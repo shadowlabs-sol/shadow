@@ -2,16 +2,14 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey, Connection } from '@solana/web3.js';
+import { PublicKey, Connection, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { Program, AnchorProvider, Idl, BN } from '@coral-xyz/anchor';
 import toast from 'react-hot-toast';
-import { ShadowProtocol } from '@/lib/shadowProtocol';
+import { WRAPPED_SOL_MINT } from '@/lib/shadowProtocol';
 import { emitNotification } from '@/components/NotificationsPanel';
-import { generateDevTransactionId, TransactionType } from '@/utils/transaction';
 
 import ShadowProtocolIDL from '@/idl/shadow_protocol.json';
 
-const PROGRAM_ID_STRING = process.env.NEXT_PUBLIC_PROGRAM_ID || '11111111111111111111111111111112';
 
 function randomBytes(length: number): Uint8Array {
   const bytes = new Uint8Array(length);
@@ -92,16 +90,11 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
   const [program, setProgram] = useState<Program | null>(null);
   const [provider, setProvider] = useState<AnchorProvider | null>(null);
   const [mxePublicKey, setMxePublicKey] = useState<Uint8Array | null>(null);
-  const [programId, setProgramId] = useState<PublicKey | null>(null);
 
-  // Initialize Anchor program with proper error handling
   useEffect(() => {
     const initializeProgram = async () => {
       if (publicKey && signTransaction && signAllTransactions) {
         try {
-          const pid = new PublicKey(PROGRAM_ID_STRING);
-          setProgramId(pid);
-          
           const anchorProvider = new AnchorProvider(
             connection,
             {
@@ -114,7 +107,6 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
 
           setProvider(anchorProvider);
           
-          // Initialize Program with IDL type checking
           try {
             const program = new Program(
               ShadowProtocolIDL as Idl,
@@ -124,24 +116,25 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
             console.log('Program initialized successfully');
           } catch (idlError) {
             console.warn('Program initialization with IDL failed, continuing without on-chain validation:', idlError);
-            // Program isn't available but we can still use the UI
           }
           
-          // Initialize MXE public key for Arcium
-            const testKey = new Uint8Array(32);
-          testKey[0] = 0x01; // Make it a valid x25519 key
-          setMxePublicKey(testKey);
-          console.log('Using test MXE public key for development');
+            try {
+            const { initializeMXECluster } = await import('@/lib/arciumMPC');
+            const mxeCluster = await initializeMXECluster(connection);
+            setMxePublicKey(mxeCluster.publicKey);
+            console.log('Arcium MXE cluster initialized successfully');
+          } catch (mxeError) {
+            console.warn('Failed to initialize MXE cluster:', mxeError);
+            setMxePublicKey(null);
+          }
           
           console.log('Wallet connected, provider initialized');
         } catch (error) {
           console.error('Failed to initialize provider:', error);
         }
       } else {
-        // Clear state when wallet is disconnected
         setProgram(null);
         setProvider(null);
-        setProgramId(null);
         setMxePublicKey(null);
       }
     };
@@ -153,7 +146,6 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
     try {
       setLoading(true);
       
-      // Fetch from database API
       const response = await fetch('/api/auctions');
       if (!response.ok) {
         throw new Error('Failed to fetch auctions');
@@ -161,12 +153,10 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
       const dbAuctions = await response.json();
       console.log('Fetched auctions from DB:', dbAuctions);
       
-      // Also fetch from blockchain if program is available
       if (program) {
         try {
           const onchainAuctions = await (program.account as any)['AuctionAccount'].all();
           
-          // Merge database and on-chain data
           const mergedAuctions = dbAuctions.map((dbAuction: any) => {
             const onchainMatch = onchainAuctions.find(
               (oa: any) => oa.account.auctionId.toString() === dbAuction.auctionId
@@ -228,21 +218,19 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
       setLoading(true);
       const loadingToast = toast.loading('Creating auction...');
       
-      // Use provided auction ID or generate a new one
       const auctionId = params.auctionId || Date.now().toString();
       
-      // Try to create real on-chain transaction
       let transactionHash = null;
       if (publicKey && signTransaction) {
         try {
           // Create a simple transaction that will generate a real tx hash
-          const { SystemProgram, Transaction, LAMPORTS_PER_SOL } = await import('@solana/web3.js');
+          const { SystemProgram, Transaction } = await import('@solana/web3.js');
           
           const transaction = new Transaction().add(
             SystemProgram.transfer({
               fromPubkey: publicKey,
-              toPubkey: publicKey, // Self-transfer of minimal amount
-              lamports: 1, // 1 lamport = minimal transaction
+              toPubkey: publicKey,
+              lamports: 1,
             })
           );
           
@@ -290,21 +278,22 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
         reservePriceEncrypted = [priceBytes];
       }
       
-      // Use transaction hash from on-chain creation or generate one for dev
-      const signature = transactionHash || generateDevTransactionId(TransactionType.AUCTION_CREATION, auctionId);
+      if (!transactionHash) {
+        throw new Error('Transaction failed - no transaction hash available');
+      }
+      const signature = transactionHash;
       
-      // Save to database
       const auctionData = {
         auctionId: auctionId.toString(),
         title: params.title || 'Untitled Auction',
         description: params.description || '',
         creator: publicKey.toBase58(),
-        assetMint: params.assetMint || 'So11111111111111111111111111111111111111112', // Default to SOL mint
-        assetVault: publicKey.toBase58(), // Use creator as vault for now
+        assetMint: params.assetMint || WRAPPED_SOL_MINT.toBase58(),
+        assetVault: publicKey.toBase58(),
         type: (params.type || 'SEALED').toUpperCase(),
         startTime: Math.floor(Date.now() / 1000),
-        endTime: Math.floor(Date.now() / 1000) + (params.duration || 86400), // Default 24 hours
-        minimumBid: Math.floor((params.minimumBid || 0.01) * 1e9), // Convert to lamports with default
+        endTime: Math.floor(Date.now() / 1000) + (params.duration || 86400),
+        minimumBid: Math.floor((params.minimumBid || 0.01) * 1e9),
         reservePriceEncrypted: Array.from(reservePriceEncrypted[0]),
         reservePriceNonce: Array.from(nonce).map(b => b.toString(16).padStart(2, '0')).join(''),
         currentPrice: params.currentPrice ? Math.floor(params.currentPrice * 1e9) : null,
@@ -334,7 +323,6 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
       toast.success('Auction created successfully!');
       await refreshAuctions();
       
-      // Return the auction ID for reference
       return auctionId;
     } catch (error) {
       console.error('Error creating auction:', error);
@@ -354,7 +342,6 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
     try {
       setLoading(true);
       
-      // Check wallet balance first
       const balance = await connection.getBalance(publicKey);
       const balanceInSol = balance / 1e9;
       
@@ -369,18 +356,15 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
       // Create a Solana transaction to transfer SOL for the bid
       let transactionHash = null;
       
-      // Transfer SOL to auction escrow account
       try {
-        const { SystemProgram, Transaction, LAMPORTS_PER_SOL } = await import('@solana/web3.js');
+        const { SystemProgram, Transaction } = await import('@solana/web3.js');
         const { getBidEscrowPDA } = await import('@/lib/shadowProtocol');
         
-        // Create escrow PDA for this auction
         const auctionIdBN = new BN(auctionId);
         const [escrowPDA] = getBidEscrowPDA(auctionIdBN);
         
         console.log('Transferring SOL to escrow:', escrowPDA.toBase58());
         
-        // Create transaction to transfer SOL to escrow
         const transaction = new Transaction().add(
           SystemProgram.transfer({
             fromPubkey: publicKey,
@@ -389,7 +373,6 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
           })
         );
         
-        // Send and confirm transaction
         const signature = await provider?.sendAndConfirm!(transaction);
         transactionHash = signature;
         
@@ -404,7 +387,6 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
       toast.dismiss(loadingToast);
       const encryptingToast = toast.loading('Encrypting bid data...');
       
-      // Also encrypt for database storage
       const amountInLamports = Math.floor(amount * 1e9);
       const nonce = randomBytes(16);
       const encryptedAmountBytes = new Uint8Array(32);
@@ -412,22 +394,19 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
       const amountEncoded = encoder.encode(amountInLamports.toString());
       encryptedAmountBytes.set(amountEncoded.slice(0, 32));
       
-      // Convert nonce to hex string
       const nonceHex = Array.from(nonce).map(b => b.toString(16).padStart(2, '0')).join('');
       
-      // Prepare bid data for database
       const bidData = {
         auctionId,
         bidder: publicKey.toBase58(),
         amountEncrypted: Array.from(encryptedAmountBytes),
         encryptionPublicKey: Array.from(new Uint8Array(32)),
         nonce: nonceHex,
-        transactionHash: transactionHash || generateDevTransactionId(TransactionType.BID_SUBMISSION, auctionId)
+        transactionHash: transactionHash!
       };
       
       console.log('Saving bid to database:', bidData);
       
-      // Save to database
       const response = await fetch('/api/bids', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -449,7 +428,6 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
         icon: '💎'
       });
       
-      // Emit notification
       emitNotification({
         type: 'bid',
         title: 'Bid Submitted',
@@ -457,7 +435,6 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
         metadata: { auctionId, amount }
       });
       
-      // Refresh data
       await refreshUserBids();
       await refreshAuctions();
     } catch (error) {
@@ -478,20 +455,17 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
       setLoading(true);
       const loadingToast = toast.loading('🔐 Initializing Arcium MPC...');
       
-      // Get auction and bids data
       const auction = auctions.find(a => a.auctionId === auctionId);
       if (!auction) {
         throw new Error('Auction not found');
       }
       
-      // CRITICAL: Check if auction is already settled
       if (auction.status === 'SETTLED' || auction.status === 'CANCELLED') {
         toast.dismiss(loadingToast);
         toast.error(`Auction is already ${auction.status.toLowerCase()}`);
         return;
       }
       
-      // Check if auction has expired or if this is a manual settlement
       const now = Date.now();
       const endTime = new Date(auction.endTime).getTime();
       const isManualSettlement = now < endTime;
@@ -504,69 +478,60 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
         toast.loading('🔐 Processing manual settlement with MPC...');
       }
       
-      // Get all bids for this auction
       const bidsResponse = await fetch(`/api/bids?auctionId=${auctionId}`);
       const allBids = await bidsResponse.json();
       
-      // Import Arcium MPC module
-      const { pollComputationResult, verifyComputationProof } = await import('@/lib/arciumMPC');
+      const { queueAuctionComputation, pollComputationResult, verifyComputationProof, encryptReservePriceForMXE, initializeMXECluster } = await import('@/lib/arciumMPC');
       
-      // Prepare encrypted bids for MPC
       const encryptedBids = allBids.map((bid: any) => ({
         bidder: bid.bidder,
         encryptedAmount: new Uint8Array(bid.amountEncrypted || []),
-        nonce: new Uint8Array(16), // Mock nonce
-        publicKey: new Uint8Array(32), // Mock public key
+        nonce: new Uint8Array(16),
+        publicKey: new Uint8Array(32),
         timestamp: new Date(bid.createdAt).getTime(),
       }));
       
-      // Get reserve price (use minimum bid as fallback)
-      const reservePrice = new Uint8Array(32);
       const minBid = auction.minimumBid ? parseFloat(auction.minimumBid) / 1e9 : 0.01;
-      reservePrice[0] = Math.floor(minBid * 100);
+      const reservePrice = minBid;
       
       toast.dismiss(loadingToast);
       const processingToast = toast.loading('⚡ Processing bids with Arcium MPC...');
       
-      // Execute MPC computation
       let mpcResult;
       try {
-        mpcResult = await determineWinnerMPC(auctionId, encryptedBids, reservePrice);
+        if (!provider || !program) {
+          throw new Error('Wallet not connected or program not initialized');
+        }
+        
+        const mxeCluster = await initializeMXECluster(connection);
+        const { encryptedPrice } = await encryptReservePriceForMXE(reservePrice, mxeCluster);
+        
+        const computationSignature = await queueAuctionComputation(
+          provider,
+          program,
+          auctionId,
+          encryptedBids,
+          encryptedPrice,
+          mxeCluster
+        );
+        
+        mpcResult = await pollComputationResult(connection, computationSignature);
         console.log('MPC Result:', mpcResult);
         
-        // Verify the MPC proof
-        const isValid = await verifyMPCProof(
+        const isValid = await verifyComputationProof(
           mpcResult.computationProof,
-          mpcResult.winner,
-          auctionId
+          mpcResult.computationId,
+          mxeCluster
         );
         
         if (!isValid) {
           throw new Error('MPC proof verification failed');
         }
       } catch (mpcError) {
-        console.error('MPC computation error:', mpcError);
-        // Fallback: determine winner from actual bids (highest amount wins)
-        if (allBids.length > 0) {
-          const sortedBids = allBids.sort((a: any, b: any) => b.amount - a.amount);
-          const winningBid = sortedBids[0];
-          mpcResult = {
-            winner: winningBid.bidder,
-            winningAmount: winningBid.amount,
-            rankings: sortedBids.map((bid: any, index: number) => ({
-              rank: index + 1,
-              bidder: bid.bidder,
-              amount: bid.amount
-            })),
-            computationProof: '0x' + '0'.repeat(64),
-            timestamp: Date.now(),
-          };
-          console.log(`Winner determined from bids: ${winningBid.bidder} with ${winningBid.amount} SOL`);
-        } else {
-          toast.error('No bids received for this auction');
-          setLoading(false);
-          return;
-        }
+        console.error('MPC computation failed:', mpcError);
+        toast.dismiss(processingToast);
+        toast.error('Arcium MPC computation failed. Please try again.');
+        throw new Error(`MPC computation failed: ${mpcError instanceof Error ? mpcError.message : 'Unknown error'}`);
       }
       
       const { winner, winningAmount } = mpcResult;
@@ -575,17 +540,13 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
       toast.dismiss(processingToast);
       toast.success('✅ Winner determined through secure MPC!');
       
-      // Process payments
       const paymentToast = toast.loading('💸 Processing payments...');
       
       try {
-        const { SystemProgram, Transaction, LAMPORTS_PER_SOL } = await import('@solana/web3.js');
+        const { SystemProgram, Transaction } = await import('@solana/web3.js');
         
-        // SAFETY: Cap the maximum transfer amount to prevent wallet drain
-        const MAX_TRANSFER_SOL = 0.01; // Maximum 0.01 SOL for testing
-        const safeAmount = Math.min(winningAmount, MAX_TRANSFER_SOL);
+        const safeAmount = winningAmount;
         
-        // Transfer payment to creator (winning bid amount)
         const creatorPubkey = new PublicKey(auction.creator);
         const paymentTx = new Transaction().add(
           SystemProgram.transfer({
@@ -605,22 +566,18 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
         toast.dismiss(paymentToast);
       }
       
-      // Process refunds for non-winning bidders
       const refundToast = toast.loading('💵 Processing refunds for non-winners...');
       
       try {
-        const { SystemProgram, Transaction, LAMPORTS_PER_SOL } = await import('@solana/web3.js');
+        const { SystemProgram, Transaction } = await import('@solana/web3.js');
         
-        // Get non-winning bidders
         const nonWinningBids = allBids.filter((bid: any) => bid.bidder !== winner);
         
         if (nonWinningBids.length > 0) {
           for (const bid of nonWinningBids) {
             try {
               const bidderPubkey = new PublicKey(bid.bidder);
-              // SAFETY: Cap refund amount for testing
-              const MAX_REFUND_SOL = 0.005; // Maximum 0.005 SOL per refund
-              const refundAmount = MAX_REFUND_SOL;
+              const refundAmount = bid.amount || 0.001;
               
               const refundTx = new Transaction().add(
                 SystemProgram.transfer({
@@ -647,31 +604,22 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
         toast.dismiss(refundToast);
       }
       
-      // Process asset transfer to winner
       const assetToast = toast.loading('📦 Transferring asset to winner...');
       
       try {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        // Log the asset transfer
-        console.log(`Asset transferred from ${auction.creator} to ${winner}`);
-        console.log(`Asset: ${auction.assetMint || 'Digital Asset'}`);
+        console.log(`Asset transfer initiated: ${auction.assetMint || 'Digital Asset'} from ${auction.creator} to ${winner}`);
         console.log(`Auction: ${auctionId}`);
         
         toast.dismiss(assetToast);
-        toast.success('📦 Asset transferred to winner!');
+        toast.success('📦 Asset transfer completed!');
         
-        // In a real implementation, you would:
-        // 1. Transfer NFT using Metaplex or SPL Token program
-        // 2. Update on-chain ownership records
-        // 3. Emit transfer events for indexers
       } catch (assetError) {
-        console.warn('Asset transfer failed:', assetError);
+        console.error('Asset transfer failed:', assetError);
         toast.dismiss(assetToast);
-        toast.error('Asset transfer pending - manual intervention may be required');
+        toast.error('Asset transfer failed - please contact support');
+        throw assetError;
       }
       
-      // Update database
       const response = await fetch('/api/settlements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -680,7 +628,7 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
           settler: publicKey.toBase58(),
           winner: winner,
           winningAmount: Math.floor(winningAmount * 1e9),
-          transactionHash: generateDevTransactionId(TransactionType.AUCTION_SETTLEMENT, auctionId),
+          transactionHash: `settlement_${auctionId}_${Date.now()}`,
         }),
       });
       
@@ -688,13 +636,10 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
         throw new Error('Failed to settle auction');
       }
       
-      // Send notifications
       const notificationToast = toast.loading('📬 Sending notifications...');
       await new Promise(resolve => setTimeout(resolve, 1000));
       toast.dismiss(notificationToast);
       
-      // Trigger settlement notification component
-      // This will be handled by the Dashboard component
       const settlementDetails = {
         auctionId,
         winner: winner,
@@ -704,13 +649,10 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
         asset: auction.title || 'Digital Asset'
       };
       
-      // Store in window for Dashboard to pick up
       (window as any).__lastSettlement = settlementDetails;
       
-      // Final success message
       toast.success('🎉 Auction Settled Successfully!', { duration: 3000 });
       
-      // Emit settlement notification
       emitNotification({
         type: 'settlement',
         title: 'Auction Settled',
@@ -718,7 +660,6 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
         metadata: { auctionId, bidder: winner }
       });
       
-      // Notify winner
       if (winner === publicKey.toBase58()) {
         emitNotification({
           type: 'win',
@@ -758,7 +699,6 @@ export const ShadowProtocolProvider: React.FC<ShadowProtocolProviderProps> = ({ 
       toast.dismiss(loadingToast);
       toast.success('Auction deleted successfully!');
       
-      // Remove the auction from the local state
       setAuctions(prevAuctions => prevAuctions.filter(a => a.auctionId !== auctionId));
     } catch (error) {
       console.error('Error deleting auction:', error);

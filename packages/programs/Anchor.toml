@@ -6,20 +6,20 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-shadow_protocol = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+shadow_protocol = "FWijhahQvD6XaUYaRueUuunaZbYe9wPbKkALNf3eyvgj"
 
 [programs.devnet]
-shadow_protocol = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+shadow_protocol = "FWijhahQvD6XaUYaRueUuunaZbYe9wPbKkALNf3eyvgj"
 
 [programs.mainnet]
-shadow_protocol = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+shadow_protocol = "FWijhahQvD6XaUYaRueUuunaZbYe9wPbKkALNf3eyvgj"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
 cluster = "devnet"
-wallet = "/home/vivek/projects/shadow/shadow-protocol/deployer-keypair.json"
+wallet = "./mxe-deployer.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

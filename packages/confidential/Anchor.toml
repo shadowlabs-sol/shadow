@@ -1,0 +1,33 @@
+[toolchain]
+anchor_version = "0.31.1"
+
+[features]
+seeds = false
+skip-lint = false
+
+[programs.localnet]
+shadow_protocol_confidential = "ShadowProtocol11111111111111111111111111111"
+
+[programs.devnet]
+shadow_protocol_confidential = "ShadowProtocol11111111111111111111111111111"
+
+[programs.mainnet]
+shadow_protocol_confidential = "ShadowProtocol11111111111111111111111111111"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "devnet"
+wallet = "/home/vivek/projects/shadow/shadow-protocol/deployer-keypair.json"
+
+[scripts]
+test = "echo 'No tests'"
+
+[test]
+startup_wait = 5000
+shutdown_wait = 2000
+upgradeable = true
+
+[workspace]
+members = []

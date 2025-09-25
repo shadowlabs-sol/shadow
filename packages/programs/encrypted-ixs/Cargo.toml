@@ -7,4 +7,4 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-arcis-imports = "0.1.40"
+arcis-imports = "0.3.0"

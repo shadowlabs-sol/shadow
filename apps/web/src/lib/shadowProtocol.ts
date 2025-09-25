@@ -4,7 +4,6 @@ import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress, createAssociatedTokenAccou
 import { RescueCipher, x25519 } from '@arcium-hq/client';
 import ShadowProtocolIDL from '@/idl/shadow_protocol.json';
 
-// Browser-compatible random bytes generation
 function randomBytes(length: number): Uint8Array {
   const bytes = new Uint8Array(length);
   if (typeof window !== 'undefined' && window.crypto) {
@@ -17,23 +16,21 @@ function randomBytes(length: number): Uint8Array {
   return bytes;
 }
 
-// Constants
-export const PROGRAM_ID = new PublicKey('HhniyEPrifbiJg4Hi53m4MjcBtSoyyDr5LkwfsHxb8RC');
+export const PROGRAM_ID = new PublicKey(process.env.NEXT_PUBLIC_PROGRAM_ID || 'DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8');
+export const WRAPPED_SOL_MINT = new PublicKey('So11111111111111111111111111111111111111112');
 export const PROTOCOL_SEED = Buffer.from('protocol');
 export const AUCTION_SEED = Buffer.from('auction');
 export const BID_SEED = Buffer.from('bid');
 export const ASSET_VAULT_SEED = Buffer.from('asset_vault');
 export const BID_ESCROW_SEED = Buffer.from('bid_escrow');
 
-// Types
 export interface CreateAuctionParams {
   assetMint: PublicKey;
   assetAmount: number;
-  duration: number; // in seconds
-  minimumBid: number; // in SOL
-  reservePrice: number; // in SOL
+  duration: number;
+  minimumBid: number;
+  reservePrice: number;
   auctionType: 'SEALED' | 'DUTCH';
-  // Dutch auction specific
   startingPrice?: number;
   priceDecreaseRate?: number;
   minimumPriceFloor?: number;
@@ -41,10 +38,9 @@ export interface CreateAuctionParams {
 
 export interface SubmitBidParams {
   auctionId: string;
-  bidAmount: number; // in SOL
+  bidAmount: number;
 }
 
-// Helper functions
 export function getProtocolPDA(): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
     [PROTOCOL_SEED],
@@ -80,7 +76,6 @@ export function getBidEscrowPDA(auctionId: BN): [PublicKey, number] {
   );
 }
 
-// Encryption helpers
 export async function encryptBidAmount(
   amount: number,
   mxePublicKey?: Uint8Array
@@ -93,32 +88,25 @@ export async function encryptBidAmount(
   const nonce = randomBytes(16);
   
   if (mxePublicKey && mxePublicKey.length === 32) {
-    // Real encryption with Arcium
-    const privateKey = x25519.utils.randomPrivateKey();
+    const privateKey = new Uint8Array(32);
+    crypto.getRandomValues(privateKey);
     const publicKey = x25519.getPublicKey(privateKey);
     
     try {
       const sharedSecret = x25519.getSharedSecret(privateKey, mxePublicKey);
       const cipher = new RescueCipher(sharedSecret);
       const encryptedResult = cipher.encrypt([amountInLamports], nonce);
-      
-      // Convert result to Uint8Array
       const encryptedAmount = new Uint8Array(32);
       if (encryptedResult && encryptedResult.length > 0) {
-        // The result is an array, get first element and convert to hex
         const resultValue: any = encryptedResult[0];
         let hexString: string = '';
-        
-        // Handle both BigInt and number types
         if (typeof resultValue === 'bigint') {
           hexString = resultValue.toString(16);
         } else if (typeof resultValue === 'number') {
           hexString = resultValue.toString(16);
         } else if (resultValue && typeof resultValue.toString === 'function') {
-          // Fallback - try to convert to string
           hexString = resultValue.toString(16) || resultValue.toString();
         } else {
-          // Last resort - just use a default value
           hexString = '0';
         }
         
@@ -136,21 +124,12 @@ export async function encryptBidAmount(
         nonce
       };
     } catch (error) {
-      console.warn('Encryption failed, using fallback:', error);
+      console.error('Encryption failed:', error);
+      throw new Error('Bid encryption failed. Please ensure Arcium MXE is properly initialized.');
     }
   }
   
-  // Fallback for development
-  const encryptedAmount = new Uint8Array(32);
-  const encoder = new TextEncoder();
-  const amountBytes = encoder.encode(amountInLamports.toString());
-  encryptedAmount.set(amountBytes.slice(0, 32));
-  
-  return {
-    encryptedAmount,
-    publicKey: new Uint8Array(32),
-    nonce
-  };
+  throw new Error('Valid MXE public key is required for bid encryption');
 }
 
 export async function encryptReservePrice(
@@ -162,17 +141,15 @@ export async function encryptReservePrice(
 }> {
   const priceInLamports = BigInt(Math.floor(price * LAMPORTS_PER_SOL));
   const nonce = randomBytes(16);
-  // Create BigInt from nonce bytes
   const nonceValue = BigInt('0x' + Array.from(nonce.slice(0, 8)).map(b => b.toString(16).padStart(2, '0')).join(''));
   
   if (mxePublicKey && mxePublicKey.length === 32) {
     try {
-      const privateKey = x25519.utils.randomPrivateKey();
+      const privateKey = new Uint8Array(32);
+      crypto.getRandomValues(privateKey);
       const sharedSecret = x25519.getSharedSecret(privateKey, mxePublicKey);
       const cipher = new RescueCipher(sharedSecret);
       const encryptedResult = cipher.encrypt([priceInLamports], nonce);
-      
-      // Convert to Uint8Array
       const encrypted = new Uint8Array(32);
       if (encryptedResult && encryptedResult.length > 0) {
         const resultValue: any = encryptedResult[0];
@@ -197,23 +174,14 @@ export async function encryptReservePrice(
         nonce: nonceValue
       };
     } catch (error) {
-      console.warn('Reserve price encryption failed:', error);
+      console.error('Reserve price encryption failed:', error);
+      throw new Error('Reserve price encryption failed. Please ensure Arcium MXE is properly initialized.');
     }
   }
   
-  // Fallback
-  const encrypted = new Uint8Array(32);
-  const encoder = new TextEncoder();
-  const priceBytes = encoder.encode(priceInLamports.toString());
-  encrypted.set(priceBytes.slice(0, 32));
-  
-  return {
-    encrypted,
-    nonce: nonceValue
-  };
+  throw new Error('Valid MXE public key is required for reserve price encryption');
 }
 
-// Main protocol class
 export class ShadowProtocol {
   private program: Program;
   private provider: AnchorProvider;
@@ -228,45 +196,47 @@ export class ShadowProtocol {
   }
   
   async initialize() {
-    // Try to get MXE public key from Arcium
     try {
-      // This would be the actual Arcium cluster address
       const mxeKey = await this.getMXEPublicKey();
-      if (mxeKey) {
+      if (mxeKey && mxeKey.length === 32) {
         this.mxePublicKey = mxeKey;
-        console.log('Arcium MXE initialized');
+        console.log('Shadow Protocol initialized with Arcium MXE');
+      } else {
+        throw new Error('Invalid MXE public key received');
       }
     } catch (error) {
-      console.warn('Arcium not available, using fallback encryption');
+      console.error('Failed to initialize Arcium MXE:', error);
+      throw new Error('Shadow Protocol initialization failed: Arcium MXE is required');
     }
   }
   
   private async getMXEPublicKey(): Promise<Uint8Array | undefined> {
-    return undefined;
+    try {
+      const { initializeMXECluster } = await import('./arciumMPC');
+      const connection = this.provider.connection;
+      const mxeCluster = await initializeMXECluster(connection);
+      return mxeCluster.publicKey;
+    } catch (error) {
+      console.error('Failed to get MXE public key:', error);
+      throw error;
+    }
   }
   
   async createAuction(params: CreateAuctionParams): Promise<string> {
     const wallet = this.provider.wallet;
-    
-    // Get next auction ID from protocol state
     const [protocolPDA] = getProtocolPDA();
     
     const auctionId = new BN(Date.now());
     const [auctionPDA] = getAuctionPDA(auctionId);
     const [assetVaultPDA] = getAssetVaultPDA(auctionId);
-    
-    // Get creator's token account
     const creatorTokenAccount = await getAssociatedTokenAddress(
       params.assetMint,
       wallet.publicKey
     );
-    
-    // Encrypt reserve price
     const { encrypted: reservePriceEncrypted, nonce: reservePriceNonce } = 
       await encryptReservePrice(params.reservePrice, this.mxePublicKey);
     
     if (params.auctionType === 'SEALED') {
-      // Create sealed bid auction
       const tx = await this.program.methods
         .createSealedAuction(
           auctionId,
@@ -290,7 +260,6 @@ export class ShadowProtocol {
       
       return tx;
     } else {
-      // Create Dutch auction
       const tx = await this.program.methods
         .createDutchAuction(
           auctionId,
@@ -325,12 +294,8 @@ export class ShadowProtocol {
     
     const [auctionPDA] = getAuctionPDA(auctionId);
     const [bidPDA] = getBidPDA(auctionId, wallet.publicKey);
-    
-    // Encrypt bid amount
     const { encryptedAmount, publicKey, nonce } = 
       await encryptBidAmount(params.bidAmount, this.mxePublicKey);
-    
-    // Generate computation offset for Arcium
     const computationOffset = new BN(randomBytes(8));
     
     const tx = await this.program.methods
@@ -356,8 +321,6 @@ export class ShadowProtocol {
     const wallet = this.provider.wallet;
     const auctionIdBN = new BN(auctionId);
     const [auctionPDA] = getAuctionPDA(auctionIdBN);
-    
-    // Generate computation offset for Arcium settlement
     const computationOffset = new BN(randomBytes(8));
     
     const tx = await this.program.methods
@@ -378,13 +341,10 @@ export class ShadowProtocol {
   async fetchAuction(auctionId: string) {
     const auctionIdBN = new BN(auctionId);
     const [auctionPDA] = getAuctionPDA(auctionIdBN);
-    
-    // return await this.program.account.auctionAccount.fetch(auctionPDA);
     return null;
   }
   
   async fetchAllAuctions() {
-    // return await this.program.account.auctionAccount.all();
     return [];
   }
 }
