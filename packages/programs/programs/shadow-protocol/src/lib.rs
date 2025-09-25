@@ -129,6 +129,34 @@ pub mod shadow_protocol {
         instructions::settle_auction(ctx, auction_id, computation_offset)
     }
 
+    pub fn queue_mpc_computation(
+        ctx: Context<QueueMpcComputation>,
+        auction_id: u64,
+        bids_count: u32,
+        encrypted_bids: Vec<EncryptedBidData>,
+        encrypted_reserve_price: [u8; 32],
+        mxe_cluster: Pubkey,
+        gas_limit: u64,
+    ) -> Result<()> {
+        instructions::queue_mpc_computation(
+            ctx,
+            auction_id,
+            bids_count,
+            encrypted_bids,
+            encrypted_reserve_price,
+            mxe_cluster,
+            gas_limit,
+        )
+    }
+
+    pub fn arcium_callback(
+        ctx: Context<ArciumCallback>,
+        computation_id: [u8; 32],
+        result: Vec<u8>,
+    ) -> Result<()> {
+        instructions::arcium_callback(ctx, computation_id, result)
+    }
+
     pub fn batch_settle(
         ctx: Context<BatchSettle>,
         auction_ids: Vec<u64>,

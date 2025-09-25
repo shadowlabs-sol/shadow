@@ -76,10 +76,18 @@ pub struct AuctionAccount {
     pub mpc_verification_hash: Option<[u8; 32]>,
     /// Whether settlement is authorized
     pub settlement_authorized: bool,
+    /// MPC computation ID
+    pub mpc_computation_id: Option<[u8; 32]>,
+    /// MXE cluster address for computation
+    pub mxe_cluster: Option<Pubkey>,
+    /// Gas limit for MPC computation
+    pub computation_gas_limit: u64,
+    /// When MPC computation was queued
+    pub computation_queued_at: Option<i64>,
     /// Bump seed
     pub bump: u8,
     /// Reserved space for future upgrades
-    pub reserved: [u8; 32],
+    pub reserved: [u8; 8],
 }
 
 #[account]

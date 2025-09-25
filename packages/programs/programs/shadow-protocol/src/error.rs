@@ -98,6 +98,7 @@ pub enum ShadowProtocolError {
     #[msg("Insufficient collateral for bid")]
     InsufficientCollateral,
     
+    
     #[msg("Invalid asset amount")]
     InvalidAssetAmount,
     
@@ -115,4 +116,13 @@ pub enum ShadowProtocolError {
     
     #[msg("Bid amount too low")]
     BidTooLow,
+    
+    #[msg("Invalid auction ID")]
+    InvalidAuctionId,
+    
+    #[msg("Invalid bid count")]
+    InvalidBidCount,
+    
+    #[msg("Too many bids")]
+    TooManyBids,
 }
