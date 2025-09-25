@@ -1,193 +1,62 @@
 {
-  "address": "HhniyEPrifbiJg4Hi53m4MjcBtSoyyDr5LkwfsHxb8RC",
+  "address": "DWrCjVyfhysTNwQh96PzScBAiCvZ3hAKWYfyHWpQqee8",
   "metadata": {
     "name": "shadow_protocol",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Shadow Protocol - Privacy-Preserving Auction Platform"
   },
-  "version": "0.1.0",
-  "name": "shadow_protocol",
-  "constants": [
-    {
-      "name": "PROTOCOL_SEED",
-      "type": "bytes",
-      "value": "[112, 114, 111, 116, 111, 99, 111, 108]"
-    },
-    {
-      "name": "AUCTION_SEED",
-      "type": "bytes",
-      "value": "[97, 117, 99, 116, 105, 111, 110]"
-    },
-    {
-      "name": "BID_SEED",
-      "type": "bytes",
-      "value": "[98, 105, 100]"
-    },
-    {
-      "name": "ASSET_VAULT_SEED",
-      "type": "bytes",
-      "value": "[97, 115, 115, 101, 116, 95, 118, 97, 117, 108, 116]"
-    },
-    {
-      "name": "BATCH_SEED",
-      "type": "bytes",
-      "value": "[98, 97, 116, 99, 104]"
-    },
-    {
-      "name": "MAX_AUCTION_DURATION",
-      "type": "i64",
-      "value": "2592000"
-    },
-    {
-      "name": "MAX_PROTOCOL_FEE",
-      "type": "u16",
-      "value": "500"
-    },
-    {
-      "name": "MAX_BIDS_PER_AUCTION",
-      "type": "usize",
-      "value": "1000"
-    }
-  ],
   "instructions": [
     {
-      "name": "initializeProtocol",
-      "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
+      "name": "arcium_callback",
+      "discriminator": [
+        217,
+        18,
+        150,
+        130,
+        185,
+        87,
+        189,
+        47
+      ],
       "accounts": [
         {
           "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "protocolState",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "bytes",
-                "value": "[112, 114, 111, 116, 111, 99, 111, 108]"
-              }
-            ]
-          }
-        },
-        {
-          "name": "feeRecipient",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "createSealedAuction",
-      "discriminator": [116, 22, 132, 101, 202, 107, 37, 82],
-      "accounts": [
-        {
-          "name": "creator",
-          "isMut": true,
-          "isSigner": true
+          "writable": true,
+          "signer": true
         },
         {
           "name": "auction",
-          "isMut": true,
-          "isSigner": false,
+          "writable": true
+        },
+        {
+          "name": "protocol_state",
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "type": "bytes",
-                "value": "[97, 117, 99, 116, 105, 111, 110]"
-              },
-              {
-                "kind": "arg",
-                "type": "u64",
-                "path": "auctionId"
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
               }
             ]
           }
         },
         {
-          "name": "protocolState",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "bytes",
-                "value": "[112, 114, 111, 116, 111, 99, 111, 108]"
-              }
-            ]
-          }
-        },
-        {
-          "name": "assetMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "assetVault",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "bytes",
-                "value": "[97, 115, 115, 101, 116, 95, 118, 97, 117, 108, 116]"
-              },
-              {
-                "kind": "arg",
-                "type": "u64",
-                "path": "auctionId"
-              }
-            ]
-          }
-        },
-        {
-          "name": "creatorAssetAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "auctionId",
-          "type": "u64"
-        },
-        {
-          "name": "assetMint",
-          "type": "publicKey"
-        },
-        {
-          "name": "duration",
-          "type": "u64"
-        },
-        {
-          "name": "minimumBid",
-          "type": "u64"
-        },
-        {
-          "name": "reservePriceEncrypted",
+          "name": "computation_id",
           "type": {
             "array": [
               "u8",
@@ -196,525 +65,1776 @@
           }
         },
         {
-          "name": "reservePriceNonce",
-          "type": "u128"
+          "name": "result",
+          "type": "bytes"
         }
       ]
     },
     {
-      "name": "createDutchAuction",
-      "discriminator": [87, 153, 178, 248, 110, 203, 212, 4],
+      "name": "authorize_settlement",
+      "discriminator": [
+        91,
+        176,
+        60,
+        105,
+        243,
+        138,
+        231,
+        244
+      ],
       "accounts": [
         {
-          "name": "creator",
-          "isMut": true,
-          "isSigner": true
+          "name": "authority",
+          "signer": true
         },
         {
           "name": "auction",
-          "isMut": true,
-          "isSigner": false,
+          "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "type": "bytes",
-                "value": "[97, 117, 99, 116, 105, 111, 110]"
+                "value": [
+                  97,
+                  117,
+                  99,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
               },
               {
                 "kind": "arg",
-                "type": "u64",
-                "path": "auctionId"
+                "path": "auction_id"
               }
             ]
           }
         },
         {
-          "name": "protocolState",
-          "isMut": false,
-          "isSigner": false,
+          "name": "protocol_state",
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "type": "bytes",
-                "value": "[112, 114, 111, 116, 111, 99, 111, 108]"
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
               }
             ]
           }
-        },
-        {
-          "name": "assetMint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "assetVault",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "bytes",
-                "value": "[97, 115, 115, 101, 116, 95, 118, 97, 117, 108, 116]"
-              },
-              {
-                "kind": "arg",
-                "type": "u64",
-                "path": "auctionId"
-              }
-            ]
-          }
-        },
-        {
-          "name": "creatorAssetAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
         {
-          "name": "auctionId",
+          "name": "auction_id",
           "type": "u64"
         },
         {
-          "name": "assetMint",
-          "type": "publicKey"
-        },
-        {
-          "name": "startingPrice",
-          "type": "u64"
-        },
-        {
-          "name": "priceDecreaseRate",
-          "type": "u64"
-        },
-        {
-          "name": "duration",
-          "type": "u64"
-        },
-        {
-          "name": "reservePriceEncrypted",
+          "name": "mpc_verification_hash",
           "type": {
             "array": [
               "u8",
               32
             ]
           }
-        },
-        {
-          "name": "reservePriceNonce",
-          "type": "u128"
         }
       ]
     },
     {
-      "name": "submitEncryptedBid",
-      "discriminator": [99, 129, 173, 128, 13, 133, 250, 209],
+      "name": "batch_cleanup_auctions",
+      "discriminator": [
+        228,
+        136,
+        74,
+        92,
+        249,
+        194,
+        68,
+        242
+      ],
       "accounts": [
         {
-          "name": "bidder",
-          "isMut": true,
-          "isSigner": true
+          "name": "cleaner",
+          "writable": true,
+          "signer": true
         },
         {
-          "name": "auction",
-          "isMut": true,
-          "isSigner": false,
+          "name": "cleanup_batch",
+          "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "type": "bytes",
-                "value": "[97, 117, 99, 116, 105, 111, 110]"
-              },
-              {
-                "kind": "arg",
-                "type": "u64",
-                "path": "auctionId"
-              }
-            ]
-          }
-        },
-        {
-          "name": "bid",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "bytes",
-                "value": "[98, 105, 100]"
-              },
-              {
-                "kind": "arg",
-                "type": "u64",
-                "path": "auctionId"
+                "value": [
+                  99,
+                  108,
+                  101,
+                  97,
+                  110,
+                  117,
+                  112,
+                  95,
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
               },
               {
                 "kind": "account",
-                "type": "publicKey",
-                "path": "bidder"
+                "path": "cleaner"
               }
             ]
           }
         },
         {
-          "name": "protocolState",
-          "isMut": false,
-          "isSigner": false,
+          "name": "protocol_state",
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "type": "bytes",
-                "value": "[112, 114, 111, 116, 111, 99, 111, 108]"
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
               }
             ]
           }
         },
         {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "auctionId",
-          "type": "u64"
-        },
-        {
-          "name": "bidAmountEncrypted",
+          "name": "auction_ids",
           "type": {
-            "array": [
-              "u8",
-              32
-            ]
+            "vec": "u64"
           }
-        },
-        {
-          "name": "publicKey",
-          "type": {
-            "array": [
-              "u8",
-              32
-            ]
-          }
-        },
-        {
-          "name": "nonce",
-          "type": "u128"
-        },
-        {
-          "name": "computationOffset",
-          "type": "u64"
         }
       ]
     },
     {
-      "name": "submitDutchBid",
-      "discriminator": [244, 158, 161, 240, 35, 122, 147, 133],
-      "accounts": [
-        {
-          "name": "bidder",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "auction",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "bytes",
-                "value": "[97, 117, 99, 116, 105, 111, 110]"
-              },
-              {
-                "kind": "arg",
-                "type": "u64",
-                "path": "auctionId"
-              }
-            ]
-          }
-        },
-        {
-          "name": "protocolState",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "bytes",
-                "value": "[112, 114, 111, 116, 111, 99, 111, 108]"
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
+      "name": "batch_settle",
+      "discriminator": [
+        176,
+        160,
+        44,
+        84,
+        68,
+        211,
+        201,
+        218
       ],
-      "args": [
-        {
-          "name": "auctionId",
-          "type": "u64"
-        },
-        {
-          "name": "bidAmount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "settleAuction",
-      "discriminator": [75, 68, 139, 154, 140, 228, 109, 103],
-      "accounts": [
-        {
-          "name": "settler",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "auction",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "bytes",
-                "value": "[97, 117, 99, 116, 105, 111, 110]"
-              },
-              {
-                "kind": "arg",
-                "type": "u64",
-                "path": "auctionId"
-              }
-            ]
-          }
-        },
-        {
-          "name": "protocolState",
-          "isMut": false,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "bytes",
-                "value": "[112, 114, 111, 116, 111, 99, 111, 108]"
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "auctionId",
-          "type": "u64"
-        },
-        {
-          "name": "computationOffset",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "batchSettle",
-      "discriminator": [113, 122, 99, 26, 137, 237, 51, 128],
       "accounts": [
         {
           "name": "creator",
-          "isMut": true,
-          "isSigner": true
+          "writable": true,
+          "signer": true
         },
         {
           "name": "batch",
-          "isMut": true,
-          "isSigner": false,
+          "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "type": "bytes",
-                "value": "[98, 97, 116, 99, 104]"
+                "value": [
+                  98,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
               },
               {
                 "kind": "account",
-                "type": "publicKey",
                 "path": "creator"
               }
             ]
           }
         },
         {
-          "name": "protocolState",
-          "isMut": false,
-          "isSigner": false,
+          "name": "protocol_state",
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "type": "bytes",
-                "value": "[112, 114, 111, 116, 111, 99, 111, 108]"
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
               }
             ]
           }
         },
         {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "auctionIds",
+          "name": "auction_ids",
           "type": {
             "vec": "u64"
           }
         },
         {
-          "name": "computationOffset",
+          "name": "computation_offset",
           "type": "u64"
         }
       ]
     },
     {
-      "name": "executeSettlement",
-      "discriminator": [89, 130, 49, 228, 128, 39, 94, 109],
+      "name": "cancel_authority_transfer",
+      "discriminator": [
+        94,
+        131,
+        125,
+        184,
+        183,
+        24,
+        125,
+        229
+      ],
       "accounts": [
         {
-          "name": "winner",
-          "isMut": true,
-          "isSigner": true
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "cleanup_expired_auction",
+      "discriminator": [
+        21,
+        47,
+        219,
+        147,
+        231,
+        178,
+        69,
+        107
+      ],
+      "accounts": [
+        {
+          "name": "cleaner",
+          "writable": true,
+          "signer": true
         },
         {
           "name": "auction",
-          "isMut": true,
-          "isSigner": false,
+          "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "type": "bytes",
-                "value": "[97, 117, 99, 116, 105, 111, 110]"
+                "value": [
+                  97,
+                  117,
+                  99,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
               },
               {
                 "kind": "arg",
-                "type": "u64",
-                "path": "auctionId"
+                "path": "auction_id"
               }
             ]
           }
         },
         {
-          "name": "protocolState",
-          "isMut": false,
-          "isSigner": false,
+          "name": "protocol_state",
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "type": "bytes",
-                "value": "[112, 114, 111, 116, 111, 99, 111, 108]"
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
               }
             ]
           }
         },
         {
-          "name": "assetVault",
-          "isMut": true,
-          "isSigner": false
+          "name": "asset_vault",
+          "docs": [
+            "Asset vault for the auction"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "auction"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "auction.asset_mint",
+                "account": "AuctionAccount"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
-          "name": "winnerAssetAccount",
-          "isMut": true,
-          "isSigner": false
+          "name": "creator_asset_account",
+          "docs": [
+            "Creator's asset account to receive refunds"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "auction.asset_mint",
+                "account": "AuctionAccount"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
-          "name": "winnerPaymentAccount",
-          "isMut": true,
-          "isSigner": false
+          "name": "creator",
+          "writable": true
         },
         {
-          "name": "creatorPaymentAccount",
-          "isMut": true,
-          "isSigner": false
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "protocolFeeAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "auctionId",
-          "type": "u64"
-        },
-        {
-          "name": "winner",
-          "type": "publicKey"
-        },
-        {
-          "name": "winningAmount",
+          "name": "auction_id",
           "type": "u64"
         }
       ]
     },
     {
-      "name": "setPauseState",
-      "discriminator": [151, 19, 128, 167, 228, 136, 255, 103],
+      "name": "cleanup_expired_bids",
+      "discriminator": [
+        80,
+        125,
+        5,
+        36,
+        46,
+        182,
+        148,
+        128
+      ],
       "accounts": [
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          "name": "cleaner",
+          "writable": true,
+          "signer": true
         },
         {
-          "name": "protocolState",
-          "isMut": true,
-          "isSigner": false,
+          "name": "auction",
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "type": "bytes",
-                "value": "[112, 114, 111, 116, 111, 99, 111, 108]"
+                "value": [
+                  97,
+                  117,
+                  99,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "auction_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_state",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "auction_id",
+          "type": "u64"
+        },
+        {
+          "name": "bid_indices",
+          "type": {
+            "vec": "u64"
+          }
+        }
+      ]
+    },
+    {
+      "name": "complete_authority_transfer",
+      "discriminator": [
+        81,
+        233,
+        91,
+        132,
+        175,
+        31,
+        151,
+        141
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_dutch_auction",
+      "discriminator": [
+        167,
+        31,
+        32,
+        196,
+        194,
+        5,
+        7,
+        89
+      ],
+      "accounts": [
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "auction",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  117,
+                  99,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "protocol_state.next_auction_id",
+                "account": "ProtocolState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "asset_mint"
+        },
+        {
+          "name": "asset_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  115,
+                  115,
+                  101,
+                  116,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "protocol_state.next_auction_id",
+                "account": "ProtocolState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator_asset_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "asset_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "asset_mint",
+          "type": "pubkey"
+        },
+        {
+          "name": "asset_amount",
+          "type": "u64"
+        },
+        {
+          "name": "starting_price",
+          "type": "u64"
+        },
+        {
+          "name": "price_decrease_rate",
+          "type": "u64"
+        },
+        {
+          "name": "minimum_price_floor",
+          "type": "u64"
+        },
+        {
+          "name": "duration",
+          "type": "u64"
+        },
+        {
+          "name": "reserve_price_encrypted",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "reserve_price_nonce",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "create_sealed_auction",
+      "discriminator": [
+        7,
+        62,
+        181,
+        127,
+        113,
+        151,
+        45,
+        164
+      ],
+      "accounts": [
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "auction",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  117,
+                  99,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "protocol_state.next_auction_id",
+                "account": "ProtocolState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "asset_mint"
+        },
+        {
+          "name": "asset_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  115,
+                  115,
+                  101,
+                  116,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "protocol_state.next_auction_id",
+                "account": "ProtocolState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator_asset_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "asset_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "asset_mint",
+          "type": "pubkey"
+        },
+        {
+          "name": "asset_amount",
+          "type": "u64"
+        },
+        {
+          "name": "duration",
+          "type": "u64"
+        },
+        {
+          "name": "minimum_bid",
+          "type": "u64"
+        },
+        {
+          "name": "reserve_price_encrypted",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "reserve_price_nonce",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "execute_settlement",
+      "discriminator": [
+        237,
+        120,
+        82,
+        62,
+        224,
+        193,
+        147,
+        137
+      ],
+      "accounts": [
+        {
+          "name": "winner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "auction",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  117,
+                  99,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "auction_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_state",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "asset_vault",
+          "docs": [
+            "Asset vault holding the auctioned item"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "auction"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "auction.asset_mint",
+                "account": "AuctionAccount"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "winner_asset_account",
+          "docs": [
+            "Winner's asset account"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "winner"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "auction.asset_mint",
+                "account": "AuctionAccount"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "winner_payment_account",
+          "docs": [
+            "Winner's payment account"
+          ],
+          "writable": true
+        },
+        {
+          "name": "creator_payment_account",
+          "docs": [
+            "Creator's payment account"
+          ],
+          "writable": true
+        },
+        {
+          "name": "protocol_fee_account",
+          "docs": [
+            "Protocol fee account"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "auction_id",
+          "type": "u64"
+        },
+        {
+          "name": "winner",
+          "type": "pubkey"
+        },
+        {
+          "name": "winning_amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "init_batch_settlement_comp_def",
+      "discriminator": [
+        90,
+        130,
+        205,
+        79,
+        92,
+        186,
+        52,
+        176
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "init_dutch_auction_comp_def",
+      "discriminator": [
+        84,
+        111,
+        63,
+        10,
+        137,
+        140,
+        197,
+        34
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "init_sealed_bid_comp_def",
+      "discriminator": [
+        163,
+        218,
+        53,
+        117,
+        13,
+        218,
+        210,
+        31
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_protocol",
+      "discriminator": [
+        188,
+        233,
+        252,
+        106,
+        134,
+        146,
+        202,
+        91
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "fee_recipient"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initiate_authority_transfer",
+      "discriminator": [
+        210,
+        43,
+        101,
+        215,
+        119,
+        140,
+        106,
+        218
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_authority"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_authority",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "queue_mpc_computation",
+      "discriminator": [
+        39,
+        111,
+        76,
+        193,
+        8,
+        110,
+        169,
+        13
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "auction",
+          "writable": true
+        },
+        {
+          "name": "protocol_state",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "mxe_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "auction_id",
+          "type": "u64"
+        },
+        {
+          "name": "bids_count",
+          "type": "u32"
+        },
+        {
+          "name": "encrypted_bids",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "EncryptedBidData"
+              }
+            }
+          }
+        },
+        {
+          "name": "encrypted_reserve_price",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "mxe_cluster",
+          "type": "pubkey"
+        },
+        {
+          "name": "gas_limit",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "reclaim_storage",
+      "discriminator": [
+        225,
+        157,
+        24,
+        76,
+        107,
+        170,
+        225,
+        41
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "protocol_state",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_pause_state",
+      "discriminator": [
+        130,
+        225,
+        63,
+        203,
+        229,
+        214,
+        138,
+        17
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
               }
             ]
           }
@@ -728,24 +1848,623 @@
       ]
     },
     {
-      "name": "updateProtocolFee",
-      "discriminator": [70, 94, 82, 250, 199, 232, 14, 225],
+      "name": "settle_auction",
+      "discriminator": [
+        246,
+        196,
+        183,
+        98,
+        222,
+        139,
+        46,
+        133
+      ],
       "accounts": [
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          "name": "settler",
+          "writable": true,
+          "signer": true
         },
         {
-          "name": "protocolState",
-          "isMut": true,
-          "isSigner": false,
+          "name": "auction",
+          "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
-                "type": "bytes",
-                "value": "[112, 114, 111, 116, 111, 99, 111, 108]"
+                "value": [
+                  97,
+                  117,
+                  99,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "auction_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_state",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "auction_id",
+          "type": "u64"
+        },
+        {
+          "name": "computation_offset",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "submit_dutch_bid",
+      "discriminator": [
+        197,
+        3,
+        244,
+        132,
+        96,
+        86,
+        222,
+        67
+      ],
+      "accounts": [
+        {
+          "name": "bidder",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "auction",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  117,
+                  99,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "auction_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_state",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "bidder_collateral_account",
+          "docs": [
+            "Bidder's collateral token account"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "bidder"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "collateral_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "protocol_payment_account",
+          "docs": [
+            "Protocol payment account"
+          ],
+          "writable": true
+        },
+        {
+          "name": "collateral_mint",
+          "docs": [
+            "Collateral token mint"
+          ]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "auction_id",
+          "type": "u64"
+        },
+        {
+          "name": "bid_amount",
+          "type": "u64"
+        },
+        {
+          "name": "collateral_amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "submit_encrypted_bid",
+      "discriminator": [
+        79,
+        24,
+        114,
+        130,
+        197,
+        38,
+        79,
+        99
+      ],
+      "accounts": [
+        {
+          "name": "bidder",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "auction",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  117,
+                  99,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "auction_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "bid",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  105,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "auction_id"
+              },
+              {
+                "kind": "account",
+                "path": "bidder"
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_state",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "bidder_collateral_account",
+          "docs": [
+            "Bidder's collateral token account"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "bidder"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "collateral_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "bid_escrow",
+          "docs": [
+            "Bid escrow account to hold collateral"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  105,
+                  100,
+                  95,
+                  101,
+                  115,
+                  99,
+                  114,
+                  111,
+                  119
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "auction_id"
+              },
+              {
+                "kind": "account",
+                "path": "bidder"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collateral_mint",
+          "docs": [
+            "Collateral token mint"
+          ]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "auction_id",
+          "type": "u64"
+        },
+        {
+          "name": "bid_amount_encrypted",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "public_key",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "nonce",
+          "type": "u128"
+        },
+        {
+          "name": "collateral_amount",
+          "type": "u64"
+        },
+        {
+          "name": "computation_offset",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "update_fee_recipient",
+      "discriminator": [
+        249,
+        0,
+        198,
+        35,
+        183,
+        123,
+        57,
+        188
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_recipient"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_recipient",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "update_protocol_fee",
+      "discriminator": [
+        170,
+        136,
+        6,
+        60,
+        43,
+        130,
+        81,
+        96
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "protocol_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
               }
             ]
           }
@@ -753,472 +2472,157 @@
       ],
       "args": [
         {
-          "name": "newFee",
+          "name": "new_fee",
           "type": "u16"
-        }
-      ]
-    },
-    {
-      "name": "updateFeeRecipient",
-      "discriminator": [213, 63, 46, 27, 115, 200, 123, 23],
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "protocolState",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "bytes",
-                "value": "[112, 114, 111, 116, 111, 99, 111, 108]"
-              }
-            ]
-          }
-        },
-        {
-          "name": "newRecipient",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "newRecipient",
-          "type": "publicKey"
-        }
-      ]
-    },
-    {
-      "name": "transferAuthority",
-      "discriminator": [161, 38, 156, 168, 106, 175, 141, 38],
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "protocolState",
-          "isMut": true,
-          "isSigner": false,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "type": "bytes",
-                "value": "[112, 114, 111, 116, 111, 99, 111, 108]"
-              }
-            ]
-          }
-        },
-        {
-          "name": "newAuthority",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "newAuthority",
-          "type": "publicKey"
         }
       ]
     }
   ],
   "accounts": [
     {
-      "name": "ProtocolState",
-      "discriminator": [212, 110, 13, 80, 156, 107, 26, 62],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "type": "publicKey"
-          },
-          {
-            "name": "protocolFee",
-            "type": "u16"
-          },
-          {
-            "name": "feeRecipient",
-            "type": "publicKey"
-          },
-          {
-            "name": "paused",
-            "type": "bool"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "reserved",
-            "type": {
-              "array": [
-                "u8",
-                128
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "AuctionAccount",
-      "discriminator": [46, 216, 185, 157, 192, 206, 119, 204],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "auctionId",
-            "type": "u64"
-          },
-          {
-            "name": "creator",
-            "type": "publicKey"
-          },
-          {
-            "name": "assetMint",
-            "type": "publicKey"
-          },
-          {
-            "name": "assetVault",
-            "type": "publicKey"
-          },
-          {
-            "name": "auctionType",
-            "type": {
-              "defined": "AuctionType"
-            }
-          },
-          {
-            "name": "status",
-            "type": {
-              "defined": "AuctionStatus"
-            }
-          },
-          {
-            "name": "startTime",
-            "type": "i64"
-          },
-          {
-            "name": "endTime",
-            "type": "i64"
-          },
-          {
-            "name": "minimumBid",
-            "type": "u64"
-          },
-          {
-            "name": "reservePriceEncrypted",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "reservePriceNonce",
-            "type": "u128"
-          },
-          {
-            "name": "currentPrice",
-            "type": "u64"
-          },
-          {
-            "name": "priceDecreaseRate",
-            "type": "u64"
-          },
-          {
-            "name": "bidCount",
-            "type": "u64"
-          },
-          {
-            "name": "winner",
-            "type": {
-              "option": "publicKey"
-            }
-          },
-          {
-            "name": "winningAmount",
-            "type": "u64"
-          },
-          {
-            "name": "settledAt",
-            "type": {
-              "option": "i64"
-            }
-          },
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "reserved",
-            "type": {
-              "array": [
-                "u8",
-                64
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "BidAccount",
-      "discriminator": [152, 8, 124, 126, 248, 29, 71, 154],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "auctionId",
-            "type": "u64"
-          },
-          {
-            "name": "bidder",
-            "type": "publicKey"
-          },
-          {
-            "name": "amountEncrypted",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "encryptionPublicKey",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "nonce",
-            "type": "u128"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
-          },
-          {
-            "name": "isWinner",
-            "type": "bool"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "reserved",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          }
-        ]
-      }
+      "discriminator": [
+        18,
+        164,
+        170,
+        5,
+        243,
+        196,
+        229,
+        90
+      ]
     },
     {
       "name": "BatchSettlement",
-      "discriminator": [183, 240, 45, 176, 117, 14, 31, 174],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "batchId",
-            "type": "u64"
-          },
-          {
-            "name": "creator",
-            "type": "publicKey"
-          },
-          {
-            "name": "auctionIds",
-            "type": {
-              "vec": "u64"
-            }
-          },
-          {
-            "name": "status",
-            "type": {
-              "defined": "BatchStatus"
-            }
-          },
-          {
-            "name": "createdAt",
-            "type": "i64"
-          },
-          {
-            "name": "settledAt",
-            "type": {
-              "option": "i64"
-            }
-          },
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "reserved",
-            "type": {
-              "array": [
-                "u8",
-                64
-              ]
-            }
-          }
-        ]
-      }
+      "discriminator": [
+        229,
+        140,
+        117,
+        0,
+        51,
+        161,
+        96,
+        81
+      ]
+    },
+    {
+      "name": "BidAccount",
+      "discriminator": [
+        27,
+        161,
+        15,
+        114,
+        230,
+        126,
+        56,
+        104
+      ]
+    },
+    {
+      "name": "CleanupBatch",
+      "discriminator": [
+        143,
+        28,
+        141,
+        51,
+        218,
+        250,
+        196,
+        87
+      ]
+    },
+    {
+      "name": "ProtocolState",
+      "discriminator": [
+        33,
+        51,
+        173,
+        134,
+        35,
+        140,
+        195,
+        248
+      ]
     }
   ],
   "events": [
     {
       "name": "AuctionCreated",
-      "discriminator": [117, 70, 199, 175, 177, 143, 244, 227],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "auctionId",
-            "type": "u64"
-          },
-          {
-            "name": "creator",
-            "type": "publicKey"
-          },
-          {
-            "name": "assetMint",
-            "type": "publicKey"
-          },
-          {
-            "name": "auctionType",
-            "type": {
-              "defined": "AuctionType"
-            }
-          },
-          {
-            "name": "startTime",
-            "type": "i64"
-          },
-          {
-            "name": "endTime",
-            "type": "i64"
-          },
-          {
-            "name": "minimumBid",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "BidSubmitted",
-      "discriminator": [190, 172, 103, 12, 122, 135, 115, 51],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "auctionId",
-            "type": "u64"
-          },
-          {
-            "name": "bidder",
-            "type": "publicKey"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
-          },
-          {
-            "name": "bidCount",
-            "type": "u64"
-          }
-        ]
-      }
+      "discriminator": [
+        133,
+        190,
+        194,
+        65,
+        172,
+        0,
+        70,
+        178
+      ]
     },
     {
       "name": "AuctionSettled",
-      "discriminator": [221, 47, 191, 238, 216, 71, 65, 220],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "auctionId",
-            "type": "u64"
-          },
-          {
-            "name": "winner",
-            "type": {
-              "option": "publicKey"
-            }
-          },
-          {
-            "name": "winningAmount",
-            "type": "u64"
-          },
-          {
-            "name": "settledAt",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "BatchSettlementCreated",
-      "discriminator": [134, 247, 214, 102, 64, 142, 163, 232],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "batchId",
-            "type": "u64"
-          },
-          {
-            "name": "creator",
-            "type": "publicKey"
-          },
-          {
-            "name": "auctionCount",
-            "type": "u64"
-          }
-        ]
-      }
+      "discriminator": [
+        61,
+        151,
+        131,
+        170,
+        95,
+        203,
+        219,
+        147
+      ]
     },
     {
       "name": "BatchSettled",
-      "discriminator": [191, 36, 220, 251, 53, 94, 229, 133],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "batchId",
-            "type": "u64"
-          },
-          {
-            "name": "settledCount",
-            "type": "u64"
-          },
-          {
-            "name": "settledAt",
-            "type": "i64"
-          }
-        ]
-      }
+      "discriminator": [
+        238,
+        14,
+        187,
+        192,
+        127,
+        95,
+        104,
+        9
+      ]
+    },
+    {
+      "name": "BatchSettlementCreated",
+      "discriminator": [
+        23,
+        137,
+        205,
+        145,
+        166,
+        121,
+        105,
+        56
+      ]
+    },
+    {
+      "name": "BidSubmitted",
+      "discriminator": [
+        116,
+        72,
+        108,
+        240,
+        175,
+        70,
+        56,
+        22
+      ]
+    },
+    {
+      "name": "MpcComputationQueued",
+      "discriminator": [
+        86,
+        41,
+        85,
+        70,
+        211,
+        160,
+        122,
+        184
+      ]
     }
   ],
   "errors": [
@@ -1346,22 +2750,388 @@
       "code": 6024,
       "name": "InvalidWinnerDetermination",
       "msg": "Invalid winner determination"
+    },
+    {
+      "code": 6025,
+      "name": "MpcVerificationFailed",
+      "msg": "MPC verification failed"
+    },
+    {
+      "code": 6026,
+      "name": "SettlementNotAuthorized",
+      "msg": "Settlement not authorized"
+    },
+    {
+      "code": 6027,
+      "name": "AuthorityTransferPending",
+      "msg": "Authority transfer already pending"
+    },
+    {
+      "code": 6028,
+      "name": "AuthorityTransferTimelockNotElapsed",
+      "msg": "Authority transfer timelock not elapsed"
+    },
+    {
+      "code": 6029,
+      "name": "NoPendingAuthorityTransfer",
+      "msg": "No pending authority transfer"
+    },
+    {
+      "code": 6030,
+      "name": "AuctionIdAlreadyExists",
+      "msg": "Auction ID already exists"
+    },
+    {
+      "code": 6031,
+      "name": "InsufficientCollateral",
+      "msg": "Insufficient collateral for bid"
+    },
+    {
+      "code": 6032,
+      "name": "InvalidAssetAmount",
+      "msg": "Invalid asset amount"
+    },
+    {
+      "code": 6033,
+      "name": "PriceBelowMinimumFloor",
+      "msg": "Price below minimum floor"
+    },
+    {
+      "code": 6034,
+      "name": "InvalidComputationId",
+      "msg": "Invalid computation ID"
+    },
+    {
+      "code": 6035,
+      "name": "InvalidMpcResult",
+      "msg": "Invalid MPC result format"
+    },
+    {
+      "code": 6036,
+      "name": "InvalidMpcVerification",
+      "msg": "MPC verification hash mismatch"
+    },
+    {
+      "code": 6037,
+      "name": "BidTooLow",
+      "msg": "Bid amount too low"
+    },
+    {
+      "code": 6038,
+      "name": "InvalidAuctionId",
+      "msg": "Invalid auction ID"
+    },
+    {
+      "code": 6039,
+      "name": "InvalidBidCount",
+      "msg": "Invalid bid count"
+    },
+    {
+      "code": 6040,
+      "name": "TooManyBids",
+      "msg": "Too many bids"
     }
   ],
   "types": [
     {
-      "name": "AuctionType",
+      "name": "AuctionAccount",
       "type": {
-        "kind": "enum",
-        "variants": [
+        "kind": "struct",
+        "fields": [
           {
-            "name": "SealedBid"
+            "name": "auction_id",
+            "docs": [
+              "Unique auction identifier"
+            ],
+            "type": "u64"
           },
           {
-            "name": "Dutch"
+            "name": "creator",
+            "docs": [
+              "Auction creator"
+            ],
+            "type": "pubkey"
           },
           {
-            "name": "Batch"
+            "name": "asset_mint",
+            "docs": [
+              "Asset being auctioned"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_vault",
+            "docs": [
+              "Asset vault holding the auctioned item"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_amount",
+            "docs": [
+              "Asset amount being auctioned"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "auction_type",
+            "docs": [
+              "Auction type"
+            ],
+            "type": {
+              "defined": {
+                "name": "AuctionType"
+              }
+            }
+          },
+          {
+            "name": "status",
+            "docs": [
+              "Auction status"
+            ],
+            "type": {
+              "defined": {
+                "name": "AuctionStatus"
+              }
+            }
+          },
+          {
+            "name": "start_time",
+            "docs": [
+              "Start time (Unix timestamp)"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "docs": [
+              "End time (Unix timestamp)"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "minimum_bid",
+            "docs": [
+              "Minimum bid amount"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "minimum_price_floor",
+            "docs": [
+              "Minimum price floor (for Dutch auctions)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "reserve_price_encrypted",
+            "docs": [
+              "Encrypted reserve price (for privacy)"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "reserve_price_nonce",
+            "docs": [
+              "Nonce for reserve price encryption"
+            ],
+            "type": "u128"
+          },
+          {
+            "name": "current_price",
+            "docs": [
+              "Current highest bid (for Dutch auctions)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "price_decrease_rate",
+            "docs": [
+              "Price decrease rate (for Dutch auctions, per slot)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "bid_count",
+            "docs": [
+              "Number of bids received"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "winner",
+            "docs": [
+              "Winner of the auction (if settled)"
+            ],
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "winning_amount",
+            "docs": [
+              "Winning bid amount"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "settled_at",
+            "docs": [
+              "Settlement timestamp"
+            ],
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "mpc_verification_hash",
+            "docs": [
+              "MPC settlement verification hash"
+            ],
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "settlement_authorized",
+            "docs": [
+              "Whether settlement is authorized"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "mpc_computation_id",
+            "docs": [
+              "MPC computation ID"
+            ],
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "mxe_cluster",
+            "docs": [
+              "MXE cluster address for computation"
+            ],
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "computation_gas_limit",
+            "docs": [
+              "Gas limit for MPC computation"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "computation_queued_at",
+            "docs": [
+              "When MPC computation was queued"
+            ],
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "Bump seed"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "reserved",
+            "docs": [
+              "Reserved space for future upgrades"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                8
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AuctionCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "auction_id",
+            "type": "u64"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "auction_type",
+            "type": {
+              "defined": {
+                "name": "AuctionType"
+              }
+            }
+          },
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          },
+          {
+            "name": "minimum_bid",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AuctionSettled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "auction_id",
+            "type": "u64"
+          },
+          {
+            "name": "winner",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "winning_amount",
+            "type": "u64"
+          },
+          {
+            "name": "settled_at",
+            "type": "i64"
           }
         ]
       }
@@ -1390,6 +3160,140 @@
       }
     },
     {
+      "name": "AuctionType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SealedBid"
+          },
+          {
+            "name": "Dutch"
+          },
+          {
+            "name": "Batch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BatchSettled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "batch_id",
+            "type": "u64"
+          },
+          {
+            "name": "settled_count",
+            "type": "u64"
+          },
+          {
+            "name": "settled_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BatchSettlement",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "batch_id",
+            "docs": [
+              "Unique batch identifier"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "creator",
+            "docs": [
+              "Creator of the batch"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "auction_ids",
+            "docs": [
+              "List of auction IDs in this batch"
+            ],
+            "type": {
+              "vec": "u64"
+            }
+          },
+          {
+            "name": "status",
+            "docs": [
+              "Settlement status"
+            ],
+            "type": {
+              "defined": {
+                "name": "BatchStatus"
+              }
+            }
+          },
+          {
+            "name": "created_at",
+            "docs": [
+              "Creation timestamp"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "settled_at",
+            "docs": [
+              "Settlement timestamp"
+            ],
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "Bump seed"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "reserved",
+            "docs": [
+              "Reserved space"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "BatchSettlementCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "batch_id",
+            "type": "u64"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "auction_count",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "BatchStatus",
       "type": {
         "kind": "enum",
@@ -1410,38 +3314,318 @@
       }
     },
     {
-      "name": "AuctionResult",
+      "name": "BidAccount",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "winner",
-            "type": "publicKey"
-          },
-          {
-            "name": "winningAmount",
+            "name": "auction_id",
+            "docs": [
+              "Reference to the auction"
+            ],
             "type": "u64"
           },
           {
-            "name": "secondPrice",
+            "name": "bidder",
+            "docs": [
+              "Bidder's public key"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "amount_encrypted",
+            "docs": [
+              "Encrypted bid amount"
+            ],
             "type": {
-              "option": "u64"
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "encryption_public_key",
+            "docs": [
+              "Public key for encryption"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "nonce",
+            "docs": [
+              "Encryption nonce"
+            ],
+            "type": "u128"
+          },
+          {
+            "name": "timestamp",
+            "docs": [
+              "Bid timestamp"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "collateral_amount",
+            "docs": [
+              "Collateral amount deposited"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "collateral_account",
+            "docs": [
+              "Collateral token account"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "is_winner",
+            "docs": [
+              "Whether this bid won the auction"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "Bump seed"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "reserved",
+            "docs": [
+              "Reserved space"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                16
+              ]
             }
           }
         ]
       }
     },
     {
-      "name": "BatchResult",
+      "name": "BidSubmitted",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "results",
+            "name": "auction_id",
+            "type": "u64"
+          },
+          {
+            "name": "bidder",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "bid_count",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CleanupBatch",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "docs": [
+              "Creator of the cleanup batch"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "auction_ids",
+            "docs": [
+              "List of auction IDs to cleanup"
+            ],
             "type": {
-              "vec": {
-                "defined": "AuctionResult"
-              }
+              "vec": "u64"
+            }
+          },
+          {
+            "name": "processed_at",
+            "docs": [
+              "Processing timestamp"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "Bump seed"
+            ],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EncryptedBidData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bidder",
+            "type": "pubkey"
+          },
+          {
+            "name": "encrypted_amount",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "nonce",
+            "type": {
+              "array": [
+                "u8",
+                16
+              ]
+            }
+          },
+          {
+            "name": "public_key",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MpcComputationQueued",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "auction_id",
+            "type": "u64"
+          },
+          {
+            "name": "computation_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bids_count",
+            "type": "u32"
+          },
+          {
+            "name": "mxe_cluster",
+            "type": "pubkey"
+          },
+          {
+            "name": "gas_limit",
+            "type": "u64"
+          },
+          {
+            "name": "queued_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProtocolState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "docs": [
+              "Protocol authority"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "protocol_fee",
+            "docs": [
+              "Protocol fee in basis points (e.g., 50 = 0.5%)"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "fee_recipient",
+            "docs": [
+              "Fee recipient"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "paused",
+            "docs": [
+              "Whether the protocol is paused"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "next_auction_id",
+            "docs": [
+              "Next auction ID (auto-incrementing)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "pending_authority",
+            "docs": [
+              "Pending authority transfer"
+            ],
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "authority_transfer_timelock",
+            "docs": [
+              "Authority transfer timelock (timestamp)"
+            ],
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "Protocol bump seed"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "reserved",
+            "docs": [
+              "Reserved space for future upgrades"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                100
+              ]
             }
           }
         ]
