@@ -2,14 +2,15 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trash2, Ban, Edit3, Eye, Users, DollarSign, Clock, Shield, TrendingDown, Award, AlertTriangle, CheckCircle, Info, ExternalLink } from 'lucide-react';
+import { X, Trash2, Ban, Users, DollarSign, Clock, Shield, TrendingDown, Award, AlertTriangle, CheckCircle, Info, ExternalLink } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { 
   getTransactionDisplayInfo, 
-  getSolscanAccountUrl, 
   getSolscanTokenUrl,
-  isValidSolanaAddress 
+  isValidSolanaAddress,
+  openExternalLink,
+  getClusterFromEnvironment
 } from '@/utils/transaction';
 
 interface AuctionManagementModalProps {
@@ -279,20 +280,20 @@ export const AuctionManagementModal: React.FC<AuctionManagementModalProps> = ({
                           <div className="flex justify-between items-center">
                             <span className="text-gray-500">Asset Mint:</span>
                             <div className="flex items-center gap-2">
-                              <span className="font-mono text-gray-400">{auction.assetMint.slice(0, 12)}...</span>
-                              <a
-                                href={getSolscanTokenUrl(auction.assetMint)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-1 hover:bg-gray-600/20 rounded transition-colors"
-                                title="View Asset on Solscan"
+                              <span className="font-mono text-gray-400 text-sm">{auction.assetMint.slice(0, 12)}...</span>
+                              <button
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  const cluster = getClusterFromEnvironment();
+                                  const url = getSolscanTokenUrl(auction.assetMint, cluster);
+                                  openExternalLink(url, 'Asset on Solscan');
                                   toast.success('Opening asset on Solscan');
                                 }}
+                                className="p-1 hover:bg-gray-600/20 rounded transition-colors"
+                                title="View Asset on Solscan"
                               >
                                 <ExternalLink className="w-3 h-3 text-blue-400" />
-                              </a>
+                              </button>
                             </div>
                           </div>
                         )}
@@ -318,31 +319,27 @@ export const AuctionManagementModal: React.FC<AuctionManagementModalProps> = ({
                           </div>
                         )}
                         {auction.transactionHash && (() => {
-                          const txInfo = getTransactionDisplayInfo(auction.transactionHash);
+                          const cluster = getClusterFromEnvironment();
+                          const txInfo = getTransactionDisplayInfo(auction.transactionHash, cluster);
                           return (
                             <div className="flex justify-between items-center">
                               <span className="text-gray-500">Transaction:</span>
                               <div className="flex items-center gap-2">
-                                <span className={`font-mono ${txInfo.className}`}>
+                                <span className={`font-mono text-sm ${txInfo.className}`}>
                                   {txInfo.displayText}
                                 </span>
-                                {txInfo.badge && (
-                                  <span className="text-xs text-gray-500 italic">{txInfo.badge}</span>
-                                )}
                                 {txInfo.showLink && txInfo.url && (
-                                  <a
-                                    href={txInfo.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="p-1 hover:bg-gray-600/20 rounded transition-colors"
-                                    title="View Transaction on Solscan"
+                                  <button
                                     onClick={(e) => {
                                       e.stopPropagation();
+                                      openExternalLink(txInfo.url!, 'Transaction on Solscan');
                                       toast.success('Opening transaction on Solscan');
                                     }}
+                                    className="p-1 hover:bg-gray-600/20 rounded transition-colors"
+                                    title="View Transaction on Solscan"
                                   >
                                     <ExternalLink className="w-3 h-3 text-blue-400" />
-                                  </a>
+                                  </button>
                                 )}
                               </div>
                             </div>

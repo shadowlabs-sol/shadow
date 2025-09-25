@@ -1,11 +1,10 @@
-export function isRealTransaction(transactionHash: string | null | undefined): boolean {
-  if (!transactionHash) return false;
+export function isValidTransactionSignature(signature: string | null | undefined): boolean {
+  if (!signature) return false;
   
   return (
-    !transactionHash.startsWith('dev_') &&
-    transactionHash.length >= 80 && // Minimum length for base58 signature
-    transactionHash.length <= 90 && // Maximum reasonable length
-    /^[1-9A-HJ-NP-Za-km-z]+$/.test(transactionHash)
+    signature.length >= 87 &&
+    signature.length <= 88 &&
+    /^[1-9A-HJ-NP-Za-km-z]+$/.test(signature)
   );
 }
 
@@ -24,40 +23,36 @@ export function getSolscanTokenUrl(tokenAddress: string, cluster: 'mainnet' | 'd
   return `https://solscan.io/token/${tokenAddress}${clusterParam}`;
 }
 
-export function formatTransactionHash(transactionHash: string, length: number = 12): string {
-  if (transactionHash.length <= length * 2) {
-    return transactionHash;
+export function formatTransactionSignature(signature: string, length: number = 12): string {
+  if (signature.length <= length * 2) {
+    return signature;
   }
-  return `${transactionHash.slice(0, length)}...${transactionHash.slice(-length)}`;
+  return `${signature.slice(0, length)}...${signature.slice(-length)}`;
 }
 
-export function getTransactionDisplayInfo(transactionHash: string | null | undefined) {
-  if (!transactionHash) {
+export function getTransactionDisplayInfo(signature: string | null | undefined, cluster: 'mainnet' | 'devnet' = 'devnet') {
+  if (!signature) {
     return {
-      isReal: false,
       displayText: 'No transaction',
       showLink: false,
       className: 'text-gray-500',
     };
   }
 
-  const isReal = isRealTransaction(transactionHash);
+  const isValid = isValidTransactionSignature(signature);
   
-  if (isReal) {
+  if (isValid) {
     return {
-      isReal: true,
-      displayText: formatTransactionHash(transactionHash),
+      displayText: formatTransactionSignature(signature),
       showLink: true,
-      className: 'text-gray-400 hover:text-blue-400',
-      url: getSolscanUrl(transactionHash),
+      className: 'text-gray-400 hover:text-blue-400 transition-colors cursor-pointer',
+      url: getSolscanUrl(signature, cluster),
     };
   } else {
     return {
-      isReal: false,
-      displayText: formatTransactionHash(transactionHash),
+      displayText: signature.length > 24 ? formatTransactionSignature(signature) : signature,
       showLink: false,
-      className: 'text-gray-400 opacity-60',
-      badge: '(development)',
+      className: 'text-gray-400',
     };
   }
 }
@@ -70,12 +65,6 @@ export enum TransactionType {
   REFUND_TRANSFER = 'refund_transfer',
 }
 
-export function generateDevTransactionId(type: TransactionType, contextId: string): string {
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).substr(2, 6);
-  return `dev_${type}_${contextId}_${timestamp}_${random}`;
-}
-
 export function isValidSolanaAddress(address: string): boolean {
   try {
     return (
@@ -86,4 +75,20 @@ export function isValidSolanaAddress(address: string): boolean {
   } catch {
     return false;
   }
+}
+
+export function formatSolanaAddress(address: string, length: number = 6): string {
+  if (address.length <= length * 2) {
+    return address;
+  }
+  return `${address.slice(0, length)}...${address.slice(-length)}`;
+}
+
+export function openExternalLink(url: string, description?: string): void {
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+export function getClusterFromEnvironment(): 'mainnet' | 'devnet' {
+  const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || '';
+  return rpcUrl.includes('mainnet') ? 'mainnet' : 'devnet';
 }
