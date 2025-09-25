@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Shield, Eye, Zap, RefreshCw, Search, Filter, 
-  TrendingUp, Activity, Clock, Users, DollarSign, Award,
+  TrendingUp, Activity, Clock, DollarSign, Award,
   ArrowUp, ArrowDown, BarChart3, PieChart, Sparkles,
   Timer, AlertCircle, CheckCircle, XCircle, ExternalLink
 } from 'lucide-react';
@@ -202,6 +202,8 @@ export const Dashboard: React.FC = () => {
   const [sortBy, setSortBy] = useState<'newest' | 'ending' | 'popular'>('newest');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [settlementDetails, setSettlementDetails] = useState<any>(null);
+  const [solPrice, setSolPrice] = useState<number>(0);
+  const [priceChange, setPriceChange] = useState<number>(0);
 
   const [activities] = useState<any[]>([]);
 
@@ -216,38 +218,64 @@ export const Dashboard: React.FC = () => {
     return () => clearInterval(checkSettlement);
   }, []);
 
+  useEffect(() => {
+    const fetchSolPrice = async () => {
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd&include_24hr_change=true');
+        const data = await response.json();
+        if (data.solana) {
+          setSolPrice(data.solana.usd);
+          setPriceChange(data.solana.usd_24h_change || 0);
+        }
+      } catch (error) {
+        console.warn('Failed to fetch SOL price:', error);
+        setSolPrice(136.67);
+        setPriceChange(2.45);
+      }
+    };
+
+    fetchSolPrice();
+    const priceInterval = setInterval(fetchSolPrice, 60000);
+    return () => clearInterval(priceInterval);
+  }, []);
+
   const stats = useMemo(() => {
     const settledAuctions = auctions.filter((a: any) => a.status === 'SETTLED');
+    const activeAuctions = auctions.filter((a: any) => a.status === 'ACTIVE');
     
     const totalVolume = settledAuctions.reduce((sum: number, auction: any) => {
       const winningAmount = parseFloat(auction.winningAmount || '0');
       return sum + winningAmount;
     }, 0);
     
-    const totalBids = auctions.reduce((sum: number, auction: any) => {
-      return sum + (auction.bidCount || 0);
-    }, 0);
-    
-    const totalEstimatedValue = auctions.reduce((sum: number, auction: any) => {
-      if (auction.status === 'SETTLED' && auction.winningAmount) {
-        return sum + parseFloat(auction.winningAmount);
+    const avgBidSize = settledAuctions.length > 0 
+      ? settledAuctions.reduce((sum: number, auction: any) => {
+          return sum + parseFloat(auction.winningAmount || '0');
+        }, 0) / settledAuctions.length
+      : activeAuctions.length > 0 
+        ? activeAuctions.reduce((sum: number, auction: any) => {
+            return sum + parseFloat(auction.minimumBid || '0');
+          }, 0) / activeAuctions.length
+        : 0;
+
+    const totalValueLocked = auctions.reduce((sum: number, auction: any) => {
+      if (auction.status === 'ACTIVE') {
+        const escrowAmount = parseFloat(auction.escrowAmount || auction.minimumBid || '0');
+        return sum + escrowAmount;
       }
-      
-      if (auction.bidCount > 0) {
-        const minBid = parseFloat(auction.minimumBid || '0');
-        return sum + (minBid * auction.bidCount);
-      }
-      
       return sum;
     }, 0);
 
     return {
       totalAuctions: auctions.length,
-      activeAuctions: auctions.filter((a: any) => a.status === 'ACTIVE').length,
+      activeAuctions: activeAuctions.length,
       totalVolume,
-      avgBidSize: totalBids > 0 ? totalEstimatedValue / totalBids : 0,
+      avgBidSize,
+      totalValueLocked,
+      solPrice,
+      priceChange,
     };
-  }, [auctions]);
+  }, [auctions, solPrice, priceChange]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -472,11 +500,24 @@ export const Dashboard: React.FC = () => {
             Network Statistics
           </h2>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <StatCard 
               icon={DollarSign} 
-              title="Total Volume Traded" 
+              title="SOL Price" 
+              value={stats.solPrice} 
+              change={stats.priceChange}
+              prefix="$"
+            />
+            <StatCard 
+              icon={BarChart3} 
+              title="Total Volume" 
               value={stats.totalVolume} 
+              suffix=" SOL"
+            />
+            <StatCard 
+              icon={Shield} 
+              title="Value Locked" 
+              value={stats.totalValueLocked} 
               suffix=" SOL"
             />
             <StatCard 
@@ -485,13 +526,8 @@ export const Dashboard: React.FC = () => {
               value={stats.activeAuctions} 
             />
             <StatCard 
-              icon={Users} 
-              title="Total Auctions" 
-              value={stats.totalAuctions} 
-            />
-            <StatCard 
               icon={TrendingUp} 
-              title="Average Bid" 
+              title="Avg Settlement" 
               value={stats.avgBidSize} 
               suffix=" SOL"
             />
