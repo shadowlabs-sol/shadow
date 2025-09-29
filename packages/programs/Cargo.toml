@@ -1,7 +1,6 @@
 [workspace]
 members = [
-    "programs/shadow-protocol",
-    "encrypted-ixs"
+    "programs/shadow-protocol"
 ]
 resolver = "2"
 

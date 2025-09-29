@@ -20,6 +20,7 @@ idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
 [dependencies]
 anchor-lang = { version = "0.31.1", features = ["init-if-needed"] }
 anchor-spl = { version = "0.31.1" }
+# TODO: Re-enable when Arcium SDK is ready for production
 # arcium-anchor = { version = "0.2.0" }
 # arcium-client = { version = "0.2.0" }
 # arcium-macros = { version = "0.2.0" }

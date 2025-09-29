@@ -125,4 +125,10 @@ pub enum ShadowProtocolError {
     
     #[msg("Too many bids")]
     TooManyBids,
+
+    #[msg("MPC submission failed")]
+    MpcSubmissionFailed,
+
+    #[msg("Computation definition inactive")]
+    ComputationDefinitionInactive,
 }
