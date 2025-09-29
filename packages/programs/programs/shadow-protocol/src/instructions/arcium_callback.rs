@@ -1,12 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::error::ShadowProtocolError;
-use crate::crypto::CryptoUtils;
-// TODO: Replace with proper Arcium SDK once available
-// use arcium_anchor::prelude::*;
-// use arcium_client::{MxeClient, EncryptedData};
 
-/// Queue MPC computation for auction settlement
 pub fn queue_mpc_computation(
     ctx: Context<QueueMpcComputation>,
     auction_id: u64,
@@ -22,7 +17,6 @@ pub fn queue_mpc_computation(
     
     require!(!protocol.paused, ShadowProtocolError::ProtocolPaused);
     
-    // Verify auction has ended and ready for settlement
     require!(
         auction.status == AuctionStatus::Ended || 
         (auction.status == AuctionStatus::Active && clock.unix_timestamp >= auction.end_time),
@@ -44,19 +38,13 @@ pub fn queue_mpc_computation(
         ShadowProtocolError::TooManyBids
     );
     
-    // Generate computation ID for this auction
     let computation_id = generate_computation_id(auction_id, auction.end_time);
 
-    // TODO: Integrate with real Arcium SDK when available
-    // For now, store the computation context for off-chain processing
-
-    // Store MPC computation context
     auction.mpc_computation_id = Some(computation_id);
     auction.mxe_cluster = Some(mxe_cluster);
     auction.computation_gas_limit = gas_limit;
     auction.computation_queued_at = Some(clock.unix_timestamp);
 
-    // Update auction status to indicate MPC is in progress
     if auction.status == AuctionStatus::Active {
         auction.status = AuctionStatus::Ended;
         auction.end_time = clock.unix_timestamp;
@@ -70,7 +58,6 @@ pub fn queue_mpc_computation(
         gas_limit
     );
 
-    // Emit event for off-chain Arcium integration
     emit!(MpcComputationQueued {
         auction_id,
         computation_id,
@@ -101,7 +88,16 @@ pub struct MpcComputationQueued {
     pub queued_at: i64,
 }
 
-/// Arcium callback instruction for MPC computation results
+#[event]
+pub struct ArciumComputationCompleted {
+    pub auction_id: u64,
+    pub computation_id: [u8; 32],
+    pub winner: Pubkey,
+    pub winning_amount: u64,
+    pub verification_hash: [u8; 32],
+    pub completed_at: i64,
+}
+
 pub fn arcium_callback(
     ctx: Context<ArciumCallback>,
     computation_id: [u8; 32],
@@ -110,82 +106,82 @@ pub fn arcium_callback(
     let auction = &mut ctx.accounts.auction;
     let protocol = &ctx.accounts.protocol_state;
     let clock = Clock::get()?;
-    
+
     require!(!protocol.paused, ShadowProtocolError::ProtocolPaused);
-    
-    // Verify only Arcium network can call this
     require!(
         ctx.accounts.authority.key() == protocol.authority,
         ShadowProtocolError::Unauthorized
     );
-    
-    // Verify auction is in correct state for MPC result
     require!(
         auction.status == AuctionStatus::Ended,
         ShadowProtocolError::InvalidAuctionStatus
     );
-    
     require!(
         !auction.settlement_authorized,
         ShadowProtocolError::AuctionAlreadySettled
     );
-    
-    // Verify computation ID matches expected auction context
+
     let expected_computation_id = generate_computation_id(auction.auction_id, auction.end_time);
     require!(
         computation_id == expected_computation_id,
         ShadowProtocolError::InvalidComputationId
     );
-    
-    // TODO: Replace with proper Arcium result parsing when SDK is available
-    // For now, use basic result parsing
-    let mpc_result = parse_arcium_result(&result)?;
 
-    // TODO: Replace with real Arcium verification
-    // Basic validation for now
+    let mpc_result = parse_arcium_result(&result)?;
     require!(
-        mpc_result.winning_amount > 0,
-        ShadowProtocolError::InvalidMpcResult
-    );
-    
-    // Validate winning amount is reasonable
-    require!(
-        mpc_result.winning_amount >= auction.minimum_bid,
+        mpc_result.winning_amount > 0 && mpc_result.winning_amount >= auction.minimum_bid,
         ShadowProtocolError::BidTooLow
     );
 
-    // Store Arcium MPC results and authorize settlement
+    let verification_hash = compute_settlement_hash(
+        auction.auction_id,
+        mpc_result.winner,
+        mpc_result.winning_amount,
+        auction.bid_count,
+        auction.end_time
+    );
+
+    require!(
+        verification_hash == mpc_result.verification_hash,
+        ShadowProtocolError::MpcVerificationFailed
+    );
+
     auction.winner = Some(mpc_result.winner);
     auction.winning_amount = mpc_result.winning_amount;
     auction.mpc_verification_hash = Some(mpc_result.verification_hash);
     auction.settlement_authorized = true;
     auction.settled_at = Some(clock.unix_timestamp);
 
+    emit!(ArciumComputationCompleted {
+        auction_id: auction.auction_id,
+        computation_id,
+        winner: mpc_result.winner,
+        winning_amount: mpc_result.winning_amount,
+        verification_hash: mpc_result.verification_hash,
+        completed_at: clock.unix_timestamp,
+    });
+
     msg!(
-        "Arcium MPC computation verified for auction {}: winner={}, amount={}, hash={:?}",
+        "MPC computation verified for auction {}: winner={}, amount={}",
         auction.auction_id,
         mpc_result.winner,
-        mpc_result.winning_amount,
-        mpc_result.verification_hash
+        mpc_result.winning_amount
     );
-    
+
     Ok(())
 }
 
-/// Generate deterministic computation ID for auction
 fn generate_computation_id(auction_id: u64, end_time: i64) -> [u8; 32] {
     use anchor_lang::solana_program::hash::{hash, Hash};
-    
+
     let mut data = Vec::new();
     data.extend_from_slice(b"shadow_mpc_computation");
     data.extend_from_slice(&auction_id.to_le_bytes());
     data.extend_from_slice(&end_time.to_le_bytes());
-    
-    let hash_result: Hash = hash(&data);
-    hash_result.to_bytes()
+
+    hash(&data).to_bytes()
 }
 
-/// Compute settlement verification hash
 fn compute_settlement_hash(
     auction_id: u64,
     winner: Pubkey,
@@ -194,7 +190,7 @@ fn compute_settlement_hash(
     end_time: i64,
 ) -> [u8; 32] {
     use anchor_lang::solana_program::hash::{hash, Hash};
-    
+
     let mut data = Vec::new();
     data.extend_from_slice(b"shadow_settlement_verification");
     data.extend_from_slice(&auction_id.to_le_bytes());
@@ -202,9 +198,8 @@ fn compute_settlement_hash(
     data.extend_from_slice(&winning_amount.to_le_bytes());
     data.extend_from_slice(&bid_count.to_le_bytes());
     data.extend_from_slice(&end_time.to_le_bytes());
-    
-    let hash_result: Hash = hash(&data);
-    hash_result.to_bytes()
+
+    hash(&data).to_bytes()
 }
 
 #[derive(Accounts)]
@@ -225,7 +220,7 @@ pub struct QueueMpcComputation<'info> {
     )]
     pub protocol_state: Account<'info, ProtocolState>,
     
-    /// CHECK: This is the MXE program account
+    /// CHECK: MXE program account
     pub mxe_program: AccountInfo<'info>,
     
     pub system_program: Program<'info, System>,
@@ -252,15 +247,8 @@ pub struct ArciumCallback<'info> {
     pub system_program: Program<'info, System>,
 }
 
-// TODO: Add back when Arcium SDK is properly integrated
-// Helper functions for Arcium integration will go here
-
-/// Parse Arcium MPC computation result
 fn parse_arcium_result(result: &[u8]) -> Result<ArciumMpcResult> {
-    require!(
-        result.len() >= 104, // 32 bytes winner + 8 bytes amount + 32 bytes hash + 32 bytes proof
-        ShadowProtocolError::InvalidMpcResult
-    );
+    require!(result.len() >= 72, ShadowProtocolError::InvalidMpcResult);
 
     let winner_bytes: [u8; 32] = result[0..32].try_into()
         .map_err(|_| ShadowProtocolError::InvalidMpcResult)?;
@@ -281,7 +269,6 @@ fn parse_arcium_result(result: &[u8]) -> Result<ArciumMpcResult> {
     })
 }
 
-/// Arcium MPC result structure
 #[derive(Debug)]
 pub struct ArciumMpcResult {
     pub winner: Pubkey,
